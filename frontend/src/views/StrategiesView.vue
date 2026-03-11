@@ -109,7 +109,24 @@ function onDrop(target:number) { const from=dragIdx.value; if(from<0||from===tar
 const openclawConfig = computed(()=>{ if(!showGuide.value) return ''; return JSON.stringify({baseUrl:`${baseUrl.value}/v1`,apiKey:showGuide.value.key0,api:'openai-completions'},null,2); });
 const curlCommand = computed(()=>{ if(!showGuide.value) return ''; return `curl ${baseUrl.value}/v1/chat/completions \\\n  -H "Authorization: Bearer ${showGuide.value.key0}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"model":"akdn","messages":[{"role":"user","content":"hello"}]}'`; });
 let toastTimer:ReturnType<typeof setTimeout>;
-function copy(text:string) { navigator.clipboard.writeText(text); copyToast.value=true; clearTimeout(toastTimer); toastTimer=setTimeout(()=>{copyToast.value=false;},1500); }
+function copy(text:string) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text);
+    } else {
+      // Fallback for HTTP: use textarea + execCommand
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    copyToast.value=true; clearTimeout(toastTimer); toastTimer=setTimeout(()=>{copyToast.value=false;},1500);
+  } catch(e) { console.error('Copy failed:', e); }
+}
 function openForm(s?:any) { formError.value=''; if(s){editingId.value=s.id;form.value={name:s.name,mode:s.mode,prompt_token_limit:s.prompt_token_limit,completion_token_limit:s.completion_token_limit}; const sorted=[...(s.providers||[])].sort((a:any,b:any)=>a.priority-b.priority); selectedOrder.value=sorted.map((p:any)=>p.provider_id);}else{editingId.value=null;form.value={name:'',mode:'priority',prompt_token_limit:0,completion_token_limit:0}; selectedOrder.value=[];} showForm.value=true; }
 async function loadStrategies() { try{strategies.value=await api('/api/strategies');}catch{} }
 async function loadProviders() { try{allProviders.value=await api('/api/providers');}catch{} }

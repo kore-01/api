@@ -257,6 +257,19 @@ akdn/
 └── .env.example            # Environment template
 ```
 
+## Uninstall
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Yorkian/AKDN/main/uninstall.sh | sudo bash
+```
+
+Or manually:
+
+```bash
+pm2 delete akdn && pm2 save
+rm -rf /opt/akdn
+```
+
 ## Buy Me a Coffee（USDT）
 
 | Network       | Address                                                                 |
