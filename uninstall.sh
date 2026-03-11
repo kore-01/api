@@ -22,6 +22,9 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+# Move out of install dir before deleting it
+cd /root 2>/dev/null || cd /tmp
+
 read -p "$(echo -e ${YELLOW}This will completely remove AKDN. Continue? [y/N] ${NC})" confirm < /dev/tty
 if [[ ! "$confirm" =~ ^[yY]$ ]]; then
   echo "Cancelled."

@@ -31,6 +31,9 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+# Ensure working directory exists (may be deleted by uninstall)
+cd /root 2>/dev/null || cd /tmp
+
 # ---- Detect package manager ----
 if command -v apt-get &> /dev/null; then
   PKG_MGR="apt-get"
