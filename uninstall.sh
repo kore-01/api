@@ -22,7 +22,7 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-read -p "$(echo -e ${YELLOW}This will completely remove AKDN. Continue? [y/N] ${NC})" confirm
+read -p "$(echo -e ${YELLOW}This will completely remove AKDN. Continue? [y/N] ${NC})" confirm < /dev/tty
 if [[ ! "$confirm" =~ ^[yY]$ ]]; then
   echo "Cancelled."
   exit 0
