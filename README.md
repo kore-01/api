@@ -126,11 +126,14 @@ pm2 restart akdn
 ### Pull from Docker Hub (Recommended)
 
 ```bash
+docker run -d --name akdn --restart unless-stopped -p 3060:3060 -v akdn-data:/app/data yorkian/akdn:latest
+```
+OR
+```bash
 mkdir akdn && cd akdn
 curl -fsSL https://raw.githubusercontent.com/Yorkian/AKDN/main/docker-compose.yml -o docker-compose.yml
 docker compose up -d
 ```
-
 Encryption keys are auto-generated on first run and persisted in the data volume. Zero configuration needed.
 
 ### Build Locally
@@ -143,10 +146,17 @@ docker compose -f docker-compose.build.yml up -d
 ### Manage
 
 ```bash
-docker compose up -d                              # Start
-docker compose logs -f akdn                       # View logs
-docker compose down                                # Stop
-docker compose pull && docker compose up -d        # Update to latest
+docker logs -f akdn               # View logs
+docker restart akdn               # Restart
+docker stop akdn && docker rm akdn        # Stop&Delate
+docker pull yorkian/akdn:latest && docker stop akdn && docker rm akdn && docker run -d --name akdn --restart unless-stopped -p 3060:3060 -v akdn-data:/app/data yorkian/akdn:latest   # Update to latest
+```
+OR
+```bash
+docker compose up -d            # Start
+docker compose logs -f akdn           # View logs
+docker compose down              Stop
+docker compose pull && docker compose up -d              # Update to latest
 ```
 
 Data and keys are persisted in Docker volume `akdn-data`.
