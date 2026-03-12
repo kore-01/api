@@ -253,6 +253,9 @@ const messages: Record<Lang, Record<string, string>> = {
     'set.uptime_hours': 'h',
     'set.uptime_mins': 'm',
     'set.uptime_secs': 's',
+    'set.donate_title': 'Buy Me a Coffee (USDT)',
+    'set.donate_click': 'Click address to copy',
+    'set.donate_copied': 'Address copied!',
   },
 
   zh: {
@@ -484,6 +487,9 @@ const messages: Record<Lang, Record<string, string>> = {
     'set.uptime_hours': '小时',
     'set.uptime_mins': '分',
     'set.uptime_secs': '秒',
+    'set.donate_title': '请我喝杯瑞幸',
+    'set.donate_click': '点击地址复制',
+    'set.donate_copied': '地址已复制！',
   },
 };
 
