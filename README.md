@@ -25,14 +25,14 @@ AKDN sits between your AI applications and API providers. Configure it once, and
 
 ```
 ┌─────────────────────┐
-│  Your AI App        │  ← Configure once: AKDN url + key
-│  (OpenClaw, etc.)   │
+│  Your AI App         │  ← Configure once: AKDN url + key
+│  (OpenClaw, etc.)    │
 └─────────┬───────────┘
           │
           ▼
 ┌─────────────────────┐
-│       AKDN          │  ← Manages keys, failover, quotas
-│  Gateway / Proxy    │
+│       AKDN           │  ← Manages keys, failover, quotas
+│  Gateway / Proxy     │
 └──┬──────┬──────┬────┘
    │      │      │
    ▼      ▼      ▼
@@ -118,6 +118,40 @@ cd frontend && npm install && npx vite build && cd ..
 npx tsc
 pm2 restart akdn
 ```
+
+## Docker
+
+[![Docker Hub](https://img.shields.io/docker/v/yorkian/akdn?label=Docker%20Hub)](https://hub.docker.com/r/yorkian/akdn)
+
+### Pull from Docker Hub (Recommended)
+
+```bash
+mkdir akdn && cd akdn
+curl -fsSL https://raw.githubusercontent.com/Yorkian/AKDN/main/docker-compose.yml -o docker-compose.yml
+docker compose up -d
+```
+
+Encryption keys are auto-generated on first run and persisted in the data volume. Zero configuration needed.
+
+### Build Locally
+
+```bash
+git clone https://github.com/Yorkian/AKDN.git && cd AKDN
+docker compose -f docker-compose.build.yml up -d
+```
+
+### Manage
+
+```bash
+docker compose up -d                              # Start
+docker compose logs -f akdn                       # View logs
+docker compose down                                # Stop
+docker compose pull && docker compose up -d        # Update to latest
+```
+
+Data and keys are persisted in Docker volume `akdn-data`.
+
+> **Note:** You can also provide your own keys via environment variables (`AKDN_ENCRYPTION_KEY`, `JWT_SECRET`) if needed. Auto-generated keys are stored in `/app/data/.akdn-keys.json` inside the volume.
 
 ## Configuration
 

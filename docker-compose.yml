@@ -1,12 +1,12 @@
 # ============================================================================
 #  AKDN — AI API Key Delivery Network
-#  Docker Compose
+#  Usage: docker compose up -d
 #  https://github.com/Yorkian/AKDN
 # ============================================================================
 
 services:
   akdn:
-    build: .
+    image: yorkian/akdn:latest
     container_name: akdn
     restart: unless-stopped
     ports:
@@ -14,19 +14,11 @@ services:
     volumes:
       - akdn-data:/app/data
     environment:
-      - PORT=3060
-      - HOST=0.0.0.0
-      - DB_PATH=/app/data/akdn.db
-      # Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-      # IMPORTANT: Set these before first run. Do not change after storing API keys.
-      - AKDN_ENCRYPTION_KEY=${AKDN_ENCRYPTION_KEY:-}
-      - JWT_SECRET=${JWT_SECRET:-}
-      # Optional
+      # Keys are auto-generated on first run and saved to the data volume.
+      # Set these only if you want to use your own keys.
+      # - AKDN_ENCRYPTION_KEY=your-64-char-hex
+      # - JWT_SECRET=your-64-char-hex
       - IPINFO_TOKEN=${IPINFO_TOKEN:-}
-      - FIRST_TOKEN_TIMEOUT=${FIRST_TOKEN_TIMEOUT:-15000}
-      - NON_STREAM_TIMEOUT=${NON_STREAM_TIMEOUT:-30000}
-      - HEALTH_CHECK_INTERVAL=${HEALTH_CHECK_INTERVAL:-60000}
-      - GEO_CACHE_TTL=${GEO_CACHE_TTL:-604800000}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3060/api/auth/status"]
       interval: 30s
