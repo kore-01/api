@@ -84,19 +84,18 @@
           <tbody>
             <tr class="table-row">
               <td class="py-2.5 pr-4 text-dark-300">BNB (BEP20)</td>
-              <td class="py-2.5 text-dark-400 font-mono text-xs break-all cursor-pointer hover:text-primary-400 transition-colors" @click="copyAddr('0x6104ff99c18405c4f3fc6bfd16adc7ff7f5b1e89')">0x6104ff99c18405c4f3fc6bfd16adc7ff7f5b1e89</td>
+              <td class="py-2.5"><span class="copiable font-mono text-xs" @click="copyAddr('0x6104ff99c18405c4f3fc6bfd16adc7ff7f5b1e89')">0x6104ff99c18405c4f3fc6bfd16adc7ff7f5b1e89</span></td>
             </tr>
             <tr class="table-row">
               <td class="py-2.5 pr-4 text-dark-300">TRC20</td>
-              <td class="py-2.5 text-dark-400 font-mono text-xs break-all cursor-pointer hover:text-primary-400 transition-colors" @click="copyAddr('TMwgiHHXmPrAMFNqa3eMvZpntsnKYuw7yp')">TMwgiHHXmPrAMFNqa3eMvZpntsnKYuw7yp</td>
+              <td class="py-2.5"><span class="copiable font-mono text-xs" @click="copyAddr('TMwgiHHXmPrAMFNqa3eMvZpntsnKYuw7yp')">TMwgiHHXmPrAMFNqa3eMvZpntsnKYuw7yp</span></td>
             </tr>
             <tr class="table-row">
               <td class="py-2.5 pr-4 text-dark-300">Aptos</td>
-              <td class="py-2.5 text-dark-400 font-mono text-xs break-all cursor-pointer hover:text-primary-400 transition-colors" @click="copyAddr('0x4323ed79c686015848a883392ed3cbc5fe7239819933546abab8cacf9ab77f46')">0x4323ed79c686015848a883392ed3cbc5fe7239819933546abab8cacf9ab77f46</td>
+              <td class="py-2.5"><span class="copiable font-mono text-xs break-all" @click="copyAddr('0x4323ed79c686015848a883392ed3cbc5fe7239819933546abab8cacf9ab77f46')">0x4323ed79c686015848a883392ed3cbc5fe7239819933546abab8cacf9ab77f46</span></td>
             </tr>
           </tbody>
         </table>
-        <p class="text-[10px] text-dark-600 mt-2">{{ t('set.donate_click') }}</p>
       </div>
 
       <!-- Chinese: QR code -->
@@ -104,6 +103,11 @@
         <img :src="donateQR" alt="赞赏码" class="w-[230px] h-[230px] rounded-lg" />
       </div>
     </div>
+
+    <!-- Copy toast -->
+    <Transition name="fade">
+      <div v-if="copyToast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm shadow-lg z-[100]">{{ t('set.donate_copied') }}</div>
+    </Transition>
   </div>
 </template>
 <script setup lang="ts">
@@ -118,6 +122,8 @@ const savingSettings = ref(false); const settingsMsg = ref(''); const settingsMs
 const stats = ref<any>({}); const clearingLogs = ref(false); const clearingGeo = ref(false);
 const pwForm = ref({ currentPassword:'', newPassword:'', confirmPassword:'' });
 const pwError = ref(''); const pwSuccess = ref(''); const pwLoading = ref(false);
+const copyToast = ref(false);
+let toastTimer: ReturnType<typeof setTimeout>;
 
 function switchLang(l: 'en'|'zh') { setLang(l); }
 
@@ -138,8 +144,20 @@ function copyAddr(text:string) {
   try {
     if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text); }
     else { const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.left='-9999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }
-    alert(t('set.donate_copied'));
+    copyToast.value=true; clearTimeout(toastTimer); toastTimer=setTimeout(()=>{copyToast.value=false;},1500);
   } catch {}
 }
 onMounted(()=>{loadSettings();loadStats();});
 </script>
+
+<style scoped>
+.copiable {
+  cursor: pointer;
+  color: #94a3b8;
+  transition: color 0.15s;
+  border-bottom: 1px dashed rgba(96, 165, 250, 0.3);
+}
+.copiable:hover { color: #60a5fa !important; }
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+</style>

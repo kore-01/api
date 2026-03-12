@@ -255,7 +255,7 @@ const messages: Record<Lang, Record<string, string>> = {
     'set.uptime_secs': 's',
     'set.donate_title': 'Buy Me a Coffee (USDT)',
     'set.donate_click': 'Click address to copy',
-    'set.donate_copied': 'Address copied!',
+    'set.donate_copied': '✅ Copied Thanks',
   },
 
   zh: {
