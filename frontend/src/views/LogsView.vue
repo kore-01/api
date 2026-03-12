@@ -34,7 +34,17 @@
       </div>
       <div class="flex items-center justify-between px-4 py-3 border-t border-dark-700/50">
         <span class="text-xs text-dark-500">{{ t('logs.total') }} {{ total }} {{ t('logs.records') }}</span>
-        <div class="flex gap-1"><button @click="page>1&&(page--,loadLogs())" :disabled="page<=1" class="btn-sm btn-secondary">{{ t('logs.prev') }}</button><span class="btn-sm text-dark-400">{{ page }} / {{ totalPages }}</span><button @click="page<totalPages&&(page++,loadLogs())" :disabled="page>=totalPages" class="btn-sm btn-secondary">{{ t('logs.next') }}</button></div>
+        <div class="flex items-center gap-4">
+          <span v-if="tokenTotals" class="text-xs text-dark-500 font-mono">
+            {{ t('logs.token_sum') }}
+            {{ t('logs.official') }}: {{ tokenTotals.provider_total?.toLocaleString() }}
+            (P:{{ tokenTotals.provider_prompt?.toLocaleString() }} / C:{{ tokenTotals.provider_completion?.toLocaleString() }})
+            &nbsp;·&nbsp;
+            {{ t('logs.estimated') }}: {{ tokenTotals.estimated_total?.toLocaleString() }}
+            (P:{{ tokenTotals.estimated_prompt?.toLocaleString() }} / C:{{ tokenTotals.estimated_completion?.toLocaleString() }})
+          </span>
+          <div class="flex gap-1"><button @click="page>1&&(page--,loadLogs())" :disabled="page<=1" class="btn-sm btn-secondary">{{ t('logs.prev') }}</button><span class="btn-sm text-dark-400">{{ page }} / {{ totalPages }}</span><button @click="page<totalPages&&(page++,loadLogs())" :disabled="page>=totalPages" class="btn-sm btn-secondary">{{ t('logs.next') }}</button></div>
+        </div>
       </div>
     </div>
   </div>
@@ -44,10 +54,10 @@ import { ref, onMounted } from 'vue';
 import { api } from '../stores/api';
 import { useI18n } from '../stores/i18n';
 const { t } = useI18n();
-const logs = ref<any[]>([]); const providers = ref<any[]>([]); const strategies = ref<any[]>([]); const total = ref(0); const page = ref(1); const perPage=50; const totalPages = ref(1); let debounceTimer:ReturnType<typeof setTimeout>;
+const logs = ref<any[]>([]); const providers = ref<any[]>([]); const strategies = ref<any[]>([]); const total = ref(0); const page = ref(1); const perPage=50; const totalPages = ref(1); const tokenTotals = ref<any>(null); let debounceTimer:ReturnType<typeof setTimeout>;
 const filters = ref({ provider_id:'',strategy_id:'',country:'',start_date:'',end_date:'' });
 function formatTime(dt:string):string { if(!dt) return '-'; const d=new Date(dt+'Z'); const mm=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); const hh=String(d.getHours()).padStart(2,'0'); const mi=String(d.getMinutes()).padStart(2,'0'); const ss=String(d.getSeconds()).padStart(2,'0'); return `${mm}-${dd} ${hh}:${mi}:${ss}`; }
 function debounceLoad() { clearTimeout(debounceTimer); debounceTimer=setTimeout(loadLogs,500); }
-async function loadLogs() { try { const params=new URLSearchParams(); params.set('page',String(page.value)); params.set('limit',String(perPage)); if(filters.value.provider_id) params.set('provider_id',filters.value.provider_id); if(filters.value.strategy_id) params.set('strategy_id',filters.value.strategy_id); if(filters.value.country) params.set('country',filters.value.country); if(filters.value.start_date) params.set('start_date',filters.value.start_date); if(filters.value.end_date) params.set('end_date',filters.value.end_date); const r=await api(`/api/logs?${params}`); logs.value=r.logs; total.value=r.total; totalPages.value=Math.max(1,Math.ceil(r.total/perPage)); } catch{} }
+async function loadLogs() { try { const params=new URLSearchParams(); params.set('page',String(page.value)); params.set('limit',String(perPage)); if(filters.value.provider_id) params.set('provider_id',filters.value.provider_id); if(filters.value.strategy_id) params.set('strategy_id',filters.value.strategy_id); if(filters.value.country) params.set('country',filters.value.country); if(filters.value.start_date) params.set('start_date',filters.value.start_date); if(filters.value.end_date) params.set('end_date',filters.value.end_date); const r=await api(`/api/logs?${params}`); logs.value=r.logs; total.value=r.total; totalPages.value=Math.max(1,Math.ceil(r.total/perPage)); tokenTotals.value=r.tokenTotals||null; } catch{} }
 onMounted(async()=>{ try{providers.value=await api('/api/providers');}catch{} try{strategies.value=await api('/api/strategies');}catch{} loadLogs(); });
 </script>

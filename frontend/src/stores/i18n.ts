@@ -196,6 +196,9 @@ const messages: Record<Lang, Record<string, string>> = {
     'logs.prev': 'Previous',
     'logs.next': 'Next',
     'logs.yes': 'Yes',
+    'logs.token_sum': 'Token Total',
+    'logs.official': 'Official',
+    'logs.estimated': 'Est.',
 
     // Settings
     'set.title': 'Settings',
@@ -425,6 +428,9 @@ const messages: Record<Lang, Record<string, string>> = {
     'logs.prev': '上一页',
     'logs.next': '下一页',
     'logs.yes': '是',
+    'logs.token_sum': 'Token 合计',
+    'logs.official': '官方',
+    'logs.estimated': '估算',
 
     'set.title': '设置',
     'set.language': '语言',

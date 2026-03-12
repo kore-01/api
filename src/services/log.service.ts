@@ -54,7 +54,7 @@ export function queryLogs(filters: {
   end_date?: string;
   page?: number;
   limit?: number;
-}): { logs: any[]; total: number } {
+}): { logs: any[]; total: number; tokenTotals: any } {
   const db = getDb();
   const conditions: string[] = [];
   const values: any[] = [];
@@ -71,6 +71,17 @@ export function queryLogs(filters: {
 
   const total = (db.prepare(`SELECT COUNT(*) as count FROM logs l ${where}`).get(...values) as any).count;
 
+  const tokenTotals = db.prepare(`
+    SELECT
+      COALESCE(SUM(provider_prompt_tokens), 0) as provider_prompt,
+      COALESCE(SUM(provider_completion_tokens), 0) as provider_completion,
+      COALESCE(SUM(provider_total_tokens), 0) as provider_total,
+      COALESCE(SUM(estimated_prompt_tokens), 0) as estimated_prompt,
+      COALESCE(SUM(estimated_completion_tokens), 0) as estimated_completion,
+      COALESCE(SUM(estimated_total_tokens), 0) as estimated_total
+    FROM logs l ${where}
+  `).get(...values) as any;
+
   const logs = db.prepare(`
     SELECT l.*, p.name as provider_name, s.name as strategy_name
     FROM logs l
@@ -81,7 +92,7 @@ export function queryLogs(filters: {
     LIMIT ? OFFSET ?
   `).all(...values, limit, offset);
 
-  return { logs, total };
+  return { logs, total, tokenTotals };
 }
 
 export function getLogStats(range: '24h' | '7d' = '24h'): any {
