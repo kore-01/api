@@ -35,7 +35,7 @@ LABEL org.opencontainers.image.title="AKDN" \
       org.opencontainers.image.vendor="Yorkian"
 
 # curl only — for healthcheck and provider testing
-RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && update-ca-certificates && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
