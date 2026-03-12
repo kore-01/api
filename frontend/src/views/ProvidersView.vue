@@ -20,6 +20,7 @@
             <button @click="runTest(p.id)" class="btn-sm btn-secondary">{{ t('prov.test') }}</button>
             <button @click="openForm(p)" class="btn-sm btn-secondary">{{ t('prov.edit') }}</button>
             <button @click="resetUsage(p.id)" class="btn-sm btn-secondary">{{ t('prov.reset') }}</button>
+            <button @click="duplicateProvider(p.id)" class="btn-sm btn-secondary">{{ t('prov.duplicate') }}</button>
             <button @click="deleteProvider(p.id)" class="btn-sm btn-danger">{{ t('prov.delete') }}</button>
           </div>
         </div>
@@ -132,6 +133,7 @@ async function loadProviders() { try{providers.value=await api('/api/providers')
 async function loadPresets() { try{presets.value=await api('/api/providers/presets');}catch{} }
 async function saveProvider() { formError.value=''; const data:any={...form.value}; if(editingId.value&&!data.api_key) delete data.api_key; saving.value=true; try { if(editingId.value){await api(`/api/providers/${editingId.value}`,{method:'PUT',body:JSON.stringify(data)});}else{await api('/api/providers',{method:'POST',body:JSON.stringify(data)});} showForm.value=false; loadProviders(); } catch(err:any){formError.value=err.message;} finally{saving.value=false;} }
 async function deleteProvider(id:string) { if(!confirm(t('prov.delete_confirm'))) return; try{await api(`/api/providers/${id}`,{method:'DELETE'}); loadProviders();}catch(err:any){alert(err.message);} }
+async function duplicateProvider(id:string) { try{await api(`/api/providers/${id}/duplicate`,{method:'POST'}); loadProviders();}catch(err:any){alert(err.message);} }
 async function runTest(id:string) { testModal.value=true; testLoading.value=true; testSteps.value=[]; try{const r=await api(`/api/providers/${id}/test`,{method:'POST'}); testSteps.value=r.steps||[];}catch(err:any){testSteps.value=[{step:'Error',status:'fail',detail:err.message}];} finally{testLoading.value=false;} }
 async function resetUsage(id:string) { try{await api(`/api/providers/${id}/reset-usage`,{method:'POST'}); loadProviders();}catch{} }
 onMounted(()=>{loadProviders();loadPresets();});

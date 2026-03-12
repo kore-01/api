@@ -58,6 +58,27 @@ export async function providerRoutes(app: FastifyInstance): Promise<void> {
     return { success: true };
   });
 
+  // Duplicate provider
+  app.post('/api/providers/:id/duplicate', async (request, reply) => {
+    const { id } = request.params as any;
+    let source: providerService.Provider | null;
+    try { source = providerService.getProviderById(id); }
+    catch (err) { return reply.code(500).send({ error: (err as Error).message }); }
+    if (!source) return reply.code(404).send({ error: 'Provider not found' });
+
+    const copy = providerService.createProvider({
+      name: `${source.name} - Copy`,
+      base_url: source.base_url,
+      api_key: source.api_key, // decrypted from source, re-encrypted on create
+      api_type: source.api_type,
+      model_id: source.model_id,
+      proxy_url: source.proxy_url || '',
+      prompt_token_limit: source.prompt_token_limit,
+      completion_token_limit: source.completion_token_limit,
+    });
+    return { ...copy, api_key: '***masked***' };
+  });
+
   // Test provider connectivity
   app.post('/api/providers/:id/test', async (request, reply) => {
     const { id } = request.params as any;
