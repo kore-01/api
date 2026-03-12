@@ -1,60 +1,62 @@
 # ============================================================================
 #  AKDN — AI API Key Delivery Network
-#  Dockerfile
 #  https://github.com/Yorkian/AKDN
 # ============================================================================
 
 # Stage 1: Build frontend
 FROM node:20-slim AS frontend-build
-WORKDIR /app/frontend
+WORKDIR /build/frontend
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ ./
 RUN npx vite build
 
-# Stage 2: Build backend
+# Stage 2: Build backend + compile native modules
 FROM node:20-slim AS backend-build
-RUN apt-get update && apt-get install -y python3 build-essential && rm -rf /var/lib/apt/lists/*
-WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends python3 build-essential && rm -rf /var/lib/apt/lists/*
+WORKDIR /build
 COPY package*.json ./
 RUN npm ci
 COPY tsconfig.json ./
 COPY src/ ./src/
 RUN npx tsc
+# Rebuild production-only node_modules with native modules compiled
+RUN rm -rf node_modules && npm ci --omit=dev
 
-# Stage 3: Production
+# Stage 3: Minimal production image
 FROM node:20-slim
-RUN apt-get update && apt-get install -y curl python3 build-essential && rm -rf /var/lib/apt/lists/*
+
+LABEL org.opencontainers.image.title="AKDN" \
+      org.opencontainers.image.description="AI API Key Delivery Network — Self-hosted AI API gateway with provider failover, load balancing, and usage quotas" \
+      org.opencontainers.image.url="https://github.com/Yorkian/AKDN" \
+      org.opencontainers.image.source="https://github.com/Yorkian/AKDN" \
+      org.opencontainers.image.documentation="https://github.com/Yorkian/AKDN#readme" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.vendor="Yorkian"
+
+# curl only — for healthcheck and provider testing
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Install production dependencies (need build tools for better-sqlite3)
-COPY package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+# Copy pre-compiled node_modules (includes better-sqlite3 native binary)
+COPY --from=backend-build /build/node_modules ./node_modules
+COPY --from=backend-build /build/dist ./dist
+COPY --from=frontend-build /build/frontend/dist ./frontend/dist
+COPY setup-keys.js ./
 
-# Copy built artifacts
-COPY --from=backend-build /app/dist ./dist
-COPY --from=frontend-build /app/frontend/dist ./frontend/dist
-
-# Copy runtime files
-COPY ecosystem.config.js setup-keys.js .env.example ./
-
-# Create data directory
 RUN mkdir -p /app/data
 
-# Environment
-ENV NODE_ENV=production
-ENV PORT=3060
-ENV HOST=0.0.0.0
-ENV DB_PATH=/app/data/akdn.db
+ENV NODE_ENV=production \
+    PORT=3060 \
+    HOST=0.0.0.0 \
+    DB_PATH=/app/data/akdn.db
 
 EXPOSE 3060
 
 VOLUME ["/app/data"]
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:3060/api/auth/status || exit 1
+    CMD curl -f http://localhost:3060/api/auth/status || exit 1
 
-# Start
 CMD ["node", "dist/index.js"]
