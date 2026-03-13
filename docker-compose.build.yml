@@ -1,0 +1,29 @@
+# ============================================================================
+#  AKDN — Build locally instead of pulling from Docker Hub
+#  Usage: docker compose -f docker-compose.build.yml up -d
+# ============================================================================
+
+services:
+  akdn:
+    build: .
+    container_name: akdn
+    restart: unless-stopped
+    ports:
+      - "3060:3060"
+    volumes:
+      - akdn-data:/app/data
+    environment:
+      - PORT=3060
+      - HOST=0.0.0.0
+      - DB_PATH=/app/data/akdn.db
+      - AKDN_ENCRYPTION_KEY=${AKDN_ENCRYPTION_KEY:-}
+      - JWT_SECRET=${JWT_SECRET:-}
+      - IPINFO_TOKEN=${IPINFO_TOKEN:-}
+      - FIRST_TOKEN_TIMEOUT=${FIRST_TOKEN_TIMEOUT:-15000}
+      - NON_STREAM_TIMEOUT=${NON_STREAM_TIMEOUT:-30000}
+      - HEALTH_CHECK_INTERVAL=${HEALTH_CHECK_INTERVAL:-60000}
+      - GEO_CACHE_TTL=${GEO_CACHE_TTL:-604800000}
+
+volumes:
+  akdn-data:
+    driver: local
