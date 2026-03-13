@@ -14,7 +14,7 @@
   <a href="#configuration">Configuration</a> •
   <a href="#how-it-works">How It Works</a> •
   <a href="#api-compatibility">API Compatibility</a> •
-  <a href="#screenshots">Screenshots</a>
+  <a href="https://yorkian.notion.site/akdn" target="_blank">中文</a>
 </p>
 
 ---
@@ -325,6 +325,10 @@ rm -rf /opt/akdn
 ## License
 
 MIT
+
+##Disclaimer
+
+The producer has tried their best to ensure the quality of the project, however, in actual use, users need to bear the risks and losses caused by issues inherent in the software itself such as security and stability, as well as the legality of the data used. Please fully test before going live in a production environment.
 
 ---
 
