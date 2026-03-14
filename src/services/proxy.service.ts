@@ -124,12 +124,17 @@ async function proxyToProvider(
 
   // Determine the correct API path based on api_type
   // Anthropic-compatible API uses /v1/messages instead of /chat/completions
+  // Responses API needs to be converted to /chat/completions for provider compatibility
   let apiPath = requestPath;
   let useAnthropicFormat = false;
   if (provider.api_type === 'anthropic-messages') {
     // Transform /chat/completions to /v1/messages for Anthropic compatibility
     apiPath = '/v1/messages';
     useAnthropicFormat = true;
+  }
+  // Convert /v1/responses to /chat/completions for OpenAI-compatible providers
+  if (requestPath === '/v1/responses') {
+    apiPath = '/chat/completions';
   }
 
   // ** CRITICAL: Override user's model with provider's model_id **

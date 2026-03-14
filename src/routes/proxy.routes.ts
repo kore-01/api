@@ -10,7 +10,7 @@ export async function proxyRoutes(app: FastifyInstance): Promise<void> {
 
   // Responses API (new OpenAI endpoint, used by OpenCode)
   app.post('/v1/responses', async (request, reply) => {
-    await handleProxyRequest(request, reply, '/chat/completions');
+    await handleProxyRequest(request, reply, '/v1/responses');
   });
 
   // Text completions
