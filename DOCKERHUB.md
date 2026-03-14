@@ -1,12 +1,12 @@
-# AKDN — AI API Key Delivery Network
+# kore — AI API Proxy
 
 Self-hosted AI API gateway / reverse proxy with provider failover, load balancing, usage quotas, and a modern web dashboard.
 
 ## Quick Start
 
 ```bash
-mkdir akdn && cd akdn
-curl -fsSL https://raw.githubusercontent.com/Yorkian/AKDN/main/docker-compose.yml -o docker-compose.yml
+mkdir kore && cd kore
+curl -fsSL https://raw.githubusercontent.com/kore-01/api/main/docker-compose.yml -o docker-compose.yml
 docker compose up -d
 ```
 
@@ -29,17 +29,17 @@ Encryption keys are auto-generated on first run and persisted in the data volume
 
 ```yaml
 services:
-  akdn:
-    image: yorkian/akdn:latest
-    container_name: akdn
+  kore:
+    image: kore01/api:latest
+    container_name: kore
     restart: unless-stopped
     ports:
       - "3060:3060"
     volumes:
-      - akdn-data:/app/data
+      - kore-data:/app/data
 
 volumes:
-  akdn-data:
+  kore-data:
 ```
 
 ## Environment Variables
@@ -48,7 +48,7 @@ All optional. Keys are auto-generated if not provided.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `AKDN_ENCRYPTION_KEY` | *(auto)* | AES-256 key for encrypting API keys |
+| `KORE_ENCRYPTION_KEY` | *(auto)* | AES-256 key for encrypting API keys |
 | `JWT_SECRET` | *(auto)* | JWT signing secret |
 | `PORT` | `3060` | Server port |
 | `IPINFO_TOKEN` | — | ipinfo.io token for GeoIP fallback |
@@ -61,7 +61,7 @@ Database and auto-generated keys are stored at `/app/data/` inside the container
 
 ```yaml
 volumes:
-  - akdn-data:/app/data    # Named volume (recommended)
+  - kore-data:/app/data    # Named volume (recommended)
   - ./data:/app/data        # Or bind mount
 ```
 
@@ -69,12 +69,12 @@ volumes:
 
 ```bash
 docker compose up -d                              # Start
-docker compose logs -f akdn                       # Logs
+docker compose logs -f kore                       # Logs
 docker compose down                                # Stop
 docker compose pull && docker compose up -d        # Update
 ```
 
 ## Links
 
-- **GitHub:** [github.com/Yorkian/AKDN](https://github.com/Yorkian/AKDN)
-- **Issues:** [github.com/Yorkian/AKDN/issues](https://github.com/Yorkian/AKDN/issues)
+- **GitHub:** [github.com/kore-01/api](https://github.com/kore-01/api)
+- **Issues:** [github.com/kore-01/api/issues](https://github.com/kore-01/api/issues)

@@ -1,6 +1,6 @@
 <p align="center">
-  <b style="font-size:32px"><span>AK</span>DN</b><br>
-  <em>AI API Key Delivery Network</em>
+  <b style="font-size:32px">kore</b><br>
+  <em>AI API Proxy</em>
 </p>
 
 <p align="center">
@@ -71,7 +71,7 @@ kore sits between your AI applications and API providers. Configure it once, and
 **One-click install** on Debian / Ubuntu:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Yorkian/kore/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/kore-01/api/main/install.sh | sudo bash
 ```
 
 This will:
@@ -87,7 +87,7 @@ Then visit `http://your-server-ip:3060` to create your admin account.
 
 ```bash
 # Prerequisites: Node.js 18+, npm, curl, git
-git clone https://github.com/Yorkian/kore.git /opt/kore
+git clone https://github.com/kore-01/api.git /opt/kore
 cd /opt/kore
 
 # Install dependencies
@@ -121,17 +121,17 @@ pm2 restart kore
 
 ## Docker
 
-[![Docker Hub](https://img.shields.io/docker/v/yorkian/kore?label=Docker%20Hub)](https://hub.docker.com/r/yorkian/kore)
+[![Docker Hub](https://img.shields.io/docker/v/kore01/api?label=Docker%20Hub)](https://hub.docker.com/r/kore01/api)
 
 ### Pull from Docker Hub (Recommended)
 
 ```bash
-docker run -d --name kore --restart unless-stopped -p 3060:3060 -v kore-data:/app/data yorkian/kore:latest
+docker run -d --name kore --restart unless-stopped -p 3060:3060 -v kore-data:/app/data kore01/api:latest
 ```
 OR
 ```bash
 mkdir kore && cd kore
-curl -fsSL https://raw.githubusercontent.com/Yorkian/kore/main/docker-compose.yml -o docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/kore-01/api/main/docker-compose.yml -o docker-compose.yml
 docker compose up -d
 ```
 Encryption keys are auto-generated on first run and persisted in the data volume. Zero configuration needed.
@@ -139,7 +139,7 @@ Encryption keys are auto-generated on first run and persisted in the data volume
 ### Build Locally
 
 ```bash
-git clone https://github.com/Yorkian/kore.git && cd kore
+git clone https://github.com/kore-01/api.git && cd kore
 docker compose -f docker-compose.build.yml up -d
 ```
 
@@ -149,7 +149,7 @@ docker compose -f docker-compose.build.yml up -d
 docker logs -f kore               # View logs
 docker restart kore               # Restart
 docker stop kore && docker rm kore        # Stop&Delate
-docker pull yorkian/kore:latest && docker stop kore && docker rm kore && docker run -d --name kore --restart unless-stopped -p 3060:3060 -v kore-data:/app/data yorkian/kore:latest   # Update to latest
+docker pull kore01/api:latest && docker stop kore && docker rm kore && docker run -d --name kore --restart unless-stopped -p 3060:3060 -v kore-data:/app/data kore01/api:latest   # Update to latest
 ```
 OR
 ```bash
@@ -161,7 +161,7 @@ docker compose pull && docker compose up -d              # Update to latest
 
 Data and keys are persisted in Docker volume `kore-data`.
 
-> **Note:** You can also provide your own keys via environment variables (`kore_ENCRYPTION_KEY`, `JWT_SECRET`) if needed. Auto-generated keys are stored in `/app/data/.kore-keys.json` inside the volume.
+> **Note:** You can also provide your own keys via environment variables (`KORE_ENCRYPTION_KEY`, `JWT_SECRET`) if needed. Auto-generated keys are stored in `/app/data/.kore-keys.json` inside the volume.
 
 ## Configuration
 
@@ -172,7 +172,7 @@ Data and keys are persisted in Docker volume `kore-data`.
 | `PORT` | `3060` | Server port |
 | `HOST` | `0.0.0.0` | Listen address |
 | `DB_PATH` | `./data/kore.db` | SQLite database path |
-| `kore_ENCRYPTION_KEY` | (auto-generated) | AES-256 key for encrypting stored API keys |
+| `KORE_ENCRYPTION_KEY` | (auto-generated) | AES-256 key for encrypting stored API keys |
 | `JWT_SECRET` | (auto-generated) | JWT signing secret |
 | `IPINFO_TOKEN` | (optional) | ipinfo.io token (fallback GeoIP source) |
 | `FIRST_TOKEN_TIMEOUT` | `15000` | Streaming first-token timeout (ms) |
@@ -180,7 +180,7 @@ Data and keys are persisted in Docker volume `kore-data`.
 | `HEALTH_CHECK_INTERVAL` | `60000` | Fault pool health check interval (ms) |
 | `GEO_CACHE_TTL` | `604800000` | GeoIP cache TTL (ms, default 7 days) |
 
-> ⚠️ **Important:** `kore_ENCRYPTION_KEY` is generated on first run. Do not change it after storing API keys, or they will become undecryptable. Back up your `.env` file.
+> ⚠️ **Important:** `KORE_ENCRYPTION_KEY` is generated on first run. Do not change it after storing API keys, or they will become undecryptable. Back up your `.env` file.
 
 ### Nginx Reverse Proxy (Optional)
 
@@ -304,7 +304,7 @@ kore/
 ## Uninstall
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Yorkian/kore/main/uninstall.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/kore-01/api/main/uninstall.sh | sudo bash
 ```
 
 Or manually:
@@ -334,5 +334,5 @@ The producer has tried their best to ensure the quality of the project, however,
 ---
 
 <p align="center">
-  <a href="https://github.com/Yorkian/kore">GitHub</a>
+  <a href="https://github.com/kore-01/api">GitHub</a>
 </p>
