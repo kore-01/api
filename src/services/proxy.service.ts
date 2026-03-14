@@ -388,6 +388,7 @@ async function proxyToProvider(
           // Transform chunk to responses format if needed
           let outputChunk = chunk;
           if (isResponsesFormat) {
+            console.log('[DEBUG] Transforming streaming chunk, isResponsesFormat=', isResponsesFormat);
             const lines = extractSSELines(chunk);
             const transformedLines: string[] = [];
 
