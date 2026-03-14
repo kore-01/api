@@ -77,6 +77,16 @@ function testApiWithNode(provider: any, apiUrl: string, requestBody: any, proxyU
       headers['anthropic-version'] = '2023-06-01';
     }
 
+    // Add custom headers for providers like Kimi-for-coding
+    if (provider.custom_headers) {
+      try {
+        const customHeaders = JSON.parse(provider.custom_headers);
+        Object.assign(headers, customHeaders);
+      } catch (e) {
+        console.warn('[WARN] Invalid custom_headers JSON:', provider.custom_headers);
+      }
+    }
+
     const options: any = {
       hostname: url.hostname,
       port: url.port || (isHttps ? 443 : 80),
