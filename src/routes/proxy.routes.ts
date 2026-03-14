@@ -31,11 +31,34 @@ export async function proxyRoutes(app: FastifyInstance): Promise<void> {
       return reply.code(401).send({ error: { message: 'Invalid API key' } });
     }
 
-    const models = (strategy.providers || []).map(p => ({
-      id: p.name || p.provider_id,
-      object: 'model',
-      owned_by: 'akdn',
-    }));
+    // Return models that OpenCode/Claude Code expects
+    // The actual model will be overridden by the provider's model_id anyway
+    const models = [
+      {
+        id: 'claude-sonnet-4-6',
+        object: 'model',
+        owned_by: 'anthropic',
+        created: 1234567890,
+      },
+      {
+        id: 'claude-opus-4-6',
+        object: 'model',
+        owned_by: 'anthropic',
+        created: 1234567890,
+      },
+      {
+        id: 'claude-3-5-sonnet-20241022',
+        object: 'model',
+        owned_by: 'anthropic',
+        created: 1234567890,
+      },
+      {
+        id: 'claude-3-5-haiku-20241022',
+        object: 'model',
+        owned_by: 'anthropic',
+        created: 1234567890,
+      },
+    ];
 
     return { object: 'list', data: models };
   });
