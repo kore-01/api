@@ -159,6 +159,34 @@ async function proxyToProvider(
     }
   }
 
+  // Debug: Log tools and tool_calls if present
+  if (forwardBody.tools) {
+    console.log('[DEBUG] Tools present:', JSON.stringify(forwardBody.tools).substring(0, 500));
+  }
+  if (forwardBody.tool_calls) {
+    console.log('[DEBUG] Tool_calls present:', JSON.stringify(forwardBody.tool_calls).substring(0, 500));
+
+    // Fix: Ensure tool_calls have valid function.name and function.arguments
+    for (const tc of forwardBody.tool_calls) {
+      if (tc.function) {
+        // Ensure function.name is a string
+        if (typeof tc.function.name !== 'string' || !tc.function.name) {
+          console.log('[DEBUG] Fixing empty function name');
+          tc.function.name = tc.function.name || 'unknown_function';
+        }
+        // Ensure function.arguments is a string
+        if (typeof tc.function.arguments === 'object' && tc.function.arguments !== null) {
+          console.log('[DEBUG] Converting function.arguments object to string');
+          tc.function.arguments = JSON.stringify(tc.function.arguments);
+        }
+        if (!tc.function.arguments || tc.function.arguments === '{}') {
+          console.log('[DEBUG] Fixing empty function.arguments');
+          tc.function.arguments = '{}';
+        }
+      }
+    }
+  }
+
   // Convert message format for Anthropic API
   if (useAnthropicFormat) {
     forwardBody = convertToAnthropicFormat(forwardBody);
