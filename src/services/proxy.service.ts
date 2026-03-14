@@ -11,6 +11,41 @@ import { proxyFetch } from '../utils/proxy-fetch';
 import { config } from '../config';
 
 /**
+ * Transform streaming chunk from chat.completion to responses delta format
+ * Chat: {"object":"chat.completion.chunk","choices":[{"delta":{"content":"..."}}]}
+ * Responses: {"type":"response.output_text.delta","delta":"...","item_id":"...","output_index":...}
+ */
+function transformToResponsesDelta(data: any, itemId: string = 'msg_1'): any {
+  const delta = data.choices?.[0]?.delta;
+  if (!delta) return null;
+
+  const result: any = {
+    type: 'response.output_text.delta',
+    delta: delta.content || '',
+    item_id: itemId,
+    output_index: 0
+  };
+
+  // Handle tool calls in streaming
+  if (delta.tool_calls && delta.tool_calls.length > 0) {
+    return {
+      type: 'response.tool_call.delta',
+      delta: {
+        tool_calls: delta.tool_calls.map((tc: any) => ({
+          id: tc.id || `toolu_${Date.now()}`,
+          name: tc.function?.name || '',
+          arguments: tc.function?.arguments || ''
+        }))
+      },
+      item_id: itemId,
+      output_index: 0
+    };
+  }
+
+  return result;
+}
+
+/**
  * Transform chat.completion response to responses API format
  * Chat: {"choices":[{"message":{"content":"..."}}]}
  * Responses: {"output":[{"type":"output_text","content":[{"type":"output_text","text":"..."}]}]}
@@ -329,6 +364,9 @@ async function proxyToProvider(
     }
 
     if (isStream && res.body) {
+      const isResponsesFormat = requestPath === '/v1/responses';
+      const itemId = `msg_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
       reply.raw.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
@@ -346,7 +384,36 @@ async function proxyToProvider(
           const { done, value } = await reader.read();
           if (done) break;
           const chunk = decoder.decode(value, { stream: true });
-          reply.raw.write(chunk);
+
+          // Transform chunk to responses format if needed
+          let outputChunk = chunk;
+          if (isResponsesFormat) {
+            const lines = extractSSELines(chunk);
+            const transformedLines: string[] = [];
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const data = JSON.parse(line.substring(6));
+                  const transformed = transformToResponsesDelta(data, itemId);
+                  if (transformed) {
+                    transformedLines.push(`data: ${JSON.stringify(transformed)}`);
+                  }
+                } catch (e) {
+                  // Not JSON, pass through as-is
+                  transformedLines.push(line);
+                }
+              } else {
+                transformedLines.push(line);
+              }
+            }
+
+            outputChunk = transformedLines.join('\n') + '\n';
+          }
+
+          reply.raw.write(outputChunk);
+
+          // Still parse for usage/completion tracking
           const lines = extractSSELines(chunk);
           for (const line of lines) {
             const parsed = parseSSEData(line);
