@@ -457,15 +457,32 @@ async function proxyToProvider(
           console.error('Stream interrupted:', (streamErr as Error).message);
         }
       } else {
-        // Provider returned non-streaming response - convert to streaming
+        // Provider returned non-streaming response - convert to responses format then to streaming
         const data = await res.json() as any;
-        console.log('[DEBUG] Converting non-streaming to streaming, data:', JSON.stringify(data).substring(200));
+        console.log('[DEBUG] Converting non-streaming to responses format, data:', JSON.stringify(data).substring(200));
 
-        const transformed = transformToResponsesDelta(data, itemId);
-        if (transformed) {
-          reply.raw.write(`data: ${JSON.stringify(transformed)}\n`);
-          completionText = transformed.delta || '';
+        // Use transformToResponsesFormat for non-streaming responses
+        const responseObj = transformToResponsesFormat(data);
+
+        // Write the complete response as a single delta event
+        const content = responseObj.output?.[0]?.content?.[0]?.text || '';
+        if (content) {
+          const deltaEvent = {
+            type: 'response.output_text.delta',
+            response_id: responseObj.id,
+            delta: content
+          };
+          reply.raw.write(`data: ${JSON.stringify(deltaEvent)}\n`);
+          completionText = content;
         }
+
+        // Write done event
+        const doneEvent = {
+          type: 'response.output_text.done',
+          response_id: responseObj.id,
+          text: completionText
+        };
+        reply.raw.write(`data: ${JSON.stringify(doneEvent)}\n`);
 
         providerUsage = data.usage;
       }
