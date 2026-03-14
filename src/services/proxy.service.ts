@@ -16,13 +16,34 @@ import { config } from '../config';
  * Responses: {"type":"response.output_text.delta","delta":"...","item_id":"...","output_index":...}
  */
 function transformToResponsesDelta(data: any, itemId: string = 'msg_1'): any {
-  console.log('[DEBUG] transformToResponsesDelta input:', JSON.stringify(data).substring(0, 300));
-  const delta = data.choices?.[0]?.delta;
-  console.log('[DEBUG] delta found:', !!delta, 'delta:', JSON.stringify(delta || {}).substring(0, 100));
+  try {
+    console.log('[DEBUG] transformToResponsesDelta input:', JSON.stringify(data).substring(0, 300));
+    const delta = data.choices?.[0]?.delta;
+    console.log('[DEBUG] delta found:', !!delta, 'delta keys:', delta ? Object.keys(delta).join(',') : 'null');
 
-  // If no delta or delta has no content and no tool_calls, skip this chunk
-  if (!delta) return null;
-  if (!delta.content && !delta.role && (!delta.tool_calls || delta.tool_calls.length === 0)) {
+    // If no delta, skip this chunk
+    if (!delta) return null;
+
+    // If delta only has role without content or tool_calls, skip
+    const hasContent = delta.content && delta.content.length > 0;
+    const hasToolCalls = delta.tool_calls && delta.tool_calls.length > 0;
+
+    if (!hasContent && !hasToolCalls) {
+      console.log('[DEBUG] Skipping chunk - no content or tool_calls');
+      return null;
+    }
+
+    const result: any = {
+      type: 'response.output_text.delta',
+      delta: delta.content || '',
+      item_id: itemId,
+      output_index: 0
+    };
+
+    console.log('[DEBUG] Transformation success, delta length:', result.delta.length);
+    return result;
+  } catch (e) {
+    console.error('[ERROR] transformToResponsesDelta failed:', e);
     return null;
   }
 
