@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # ============================================================================
-#  AKDN — Uninstall Script
-#  https://github.com/Yorkian/AKDN
+#  kore — Uninstall Script
+#  https://github.com/Yorkian/kore
 # ============================================================================
 
-INSTALL_DIR="/opt/akdn"
+INSTALL_DIR="/opt/kore"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -14,7 +14,7 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 echo ""
-echo -e "${CYAN}AKDN — Uninstaller${NC}"
+echo -e "${CYAN}kore — Uninstaller${NC}"
 echo ""
 
 if [ "$EUID" -ne 0 ]; then
@@ -25,7 +25,7 @@ fi
 # Move out of install dir before deleting it
 cd /root 2>/dev/null || cd /tmp
 
-read -p "$(echo -e ${YELLOW}This will completely remove AKDN. Continue? [y/N] ${NC})" confirm < /dev/tty
+read -p "$(echo -e ${YELLOW}This will completely remove kore. Continue? [y/N] ${NC})" confirm < /dev/tty
 if [[ ! "$confirm" =~ ^[yY]$ ]]; then
   echo "Cancelled."
   exit 0
@@ -33,8 +33,8 @@ fi
 
 # Stop and remove PM2 process
 if command -v pm2 &> /dev/null; then
-  echo -e "${CYAN}Stopping AKDN service...${NC}"
-  pm2 delete akdn 2>/dev/null && echo -e "${GREEN}✓ PM2 process removed${NC}" || echo -e "${YELLOW}  PM2 process not found, skipping${NC}"
+  echo -e "${CYAN}Stopping kore service...${NC}"
+  pm2 delete kore 2>/dev/null && echo -e "${GREEN}✓ PM2 process removed${NC}" || echo -e "${YELLOW}  PM2 process not found, skipping${NC}"
   pm2 save 2>/dev/null
 fi
 
@@ -47,7 +47,7 @@ else
 fi
 
 echo ""
-echo -e "${GREEN}✅ AKDN has been removed.${NC}"
+echo -e "${GREEN}✅ kore has been removed.${NC}"
 echo ""
 echo -e "  ${CYAN}Note:${NC} Node.js and PM2 were not removed."
 echo -e "  To remove them manually:"

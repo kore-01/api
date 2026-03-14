@@ -1,22 +1,22 @@
 # ============================================================================
-#  AKDN — AI API Key Delivery Network
+#  kore — AI API Proxy
 #  Usage: docker compose up -d
-#  https://github.com/Yorkian/AKDN
+#  https://github.com/kore-01/api
 # ============================================================================
 
 services:
-  akdn:
-    image: yorkian/akdn:latest
-    container_name: akdn
+  kore:
+    image: kore01/api:latest
+    container_name: kore
     restart: unless-stopped
     ports:
       - "3060:3060"
     volumes:
-      - akdn-data:/app/data
+      - kore-data:/app/data
     environment:
       # Keys are auto-generated on first run and saved to the data volume.
       # Set these only if you want to use your own keys.
-      # - AKDN_ENCRYPTION_KEY=your-64-char-hex
+      # - KORE_ENCRYPTION_KEY=your-64-char-hex
       # - JWT_SECRET=your-64-char-hex
       - IPINFO_TOKEN=${IPINFO_TOKEN:-}
     healthcheck:
@@ -27,5 +27,5 @@ services:
       start_period: 10s
 
 volumes:
-  akdn-data:
+  kore-data:
     driver: local

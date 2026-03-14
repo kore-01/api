@@ -14,24 +14,24 @@
   <a href="#configuration">Configuration</a> •
   <a href="#how-it-works">How It Works</a> •
   <a href="#api-compatibility">API Compatibility</a> •
-  <a href="https://yorkian.notion.site/akdn" target="_blank">中文</a>
+  <a href="https://yorkian.notion.site/kore" target="_blank">中文</a>
 </p>
 
 ---
 
-## What is AKDN?
+## What is kore?
 
-AKDN sits between your AI applications and API providers. Configure it once, and your downstream apps (OpenClaw, LobeChat, ChatGPT-Next-Web, etc.) never need to know when you switch providers, rotate keys, or add failover.
+kore sits between your AI applications and API providers. Configure it once, and your downstream apps (OpenClaw, LobeChat, ChatGPT-Next-Web, etc.) never need to know when you switch providers, rotate keys, or add failover.
 
 ```
 ┌─────────────────────┐
-│  Your AI App         │  ← Configure once: AKDN url + key
+│  Your AI App         │  ← Configure once: kore url + key
 │  (OpenClaw, etc.)    │
 └─────────┬───────────┘
           │
           ▼
 ┌─────────────────────┐
-│       AKDN           │  ← Manages keys, failover, quotas
+│       kore           │  ← Manages keys, failover, quotas
 │  Gateway / Proxy     │
 └──┬──────┬──────┬────┘
    │      │      │
@@ -41,7 +41,7 @@ AKDN sits between your AI applications and API providers. Configure it once, and
 
 ## Features
 
-- **One Config, Switch Anytime** — Downstream apps configure AKDN's URL and key once. Switch providers, rotate keys, or add new ones entirely from AKDN's dashboard.
+- **One Config, Switch Anytime** — Downstream apps configure kore's URL and key once. Switch providers, rotate keys, or add new ones entirely from kore's dashboard.
 
 - **OpenAI-Compatible API** — Exposes standard `/v1/chat/completions` endpoint. Any app that supports custom OpenAI endpoints works out of the box.
 
@@ -64,19 +64,19 @@ AKDN sits between your AI applications and API providers. Configure it once, and
 
 - **Multi-language** — English and Chinese. Switchable from Settings.
 
-- **Secure** — API keys encrypted with AES-256-GCM in SQLite. Admin auth via JWT. AKDN generates its own independent keys (key0) for downstream apps.
+- **Secure** — API keys encrypted with AES-256-GCM in SQLite. Admin auth via JWT. kore generates its own independent keys (key0) for downstream apps.
 
 ## Quick Start
 
 **One-click install** on Debian / Ubuntu:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Yorkian/AKDN/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/Yorkian/kore/main/install.sh | sudo bash
 ```
 
 This will:
 1. Install Node.js 20 (if needed) and PM2
-2. Clone the repo to `/opt/akdn`
+2. Clone the repo to `/opt/kore`
 3. Install dependencies and build
 4. Generate encryption keys
 5. Start the service on port `3060`
@@ -87,8 +87,8 @@ Then visit `http://your-server-ip:3060` to create your admin account.
 
 ```bash
 # Prerequisites: Node.js 18+, npm, curl, git
-git clone https://github.com/Yorkian/AKDN.git /opt/akdn
-cd /opt/akdn
+git clone https://github.com/Yorkian/kore.git /opt/kore
+cd /opt/kore
 
 # Install dependencies
 npm install
@@ -110,28 +110,28 @@ pm2 save && pm2 startup
 ### Updating
 
 ```bash
-cd /opt/akdn
-pm2 stop akdn
+cd /opt/kore
+pm2 stop kore
 git pull
 npm install
 cd frontend && npm install && npx vite build && cd ..
 npx tsc
-pm2 restart akdn
+pm2 restart kore
 ```
 
 ## Docker
 
-[![Docker Hub](https://img.shields.io/docker/v/yorkian/akdn?label=Docker%20Hub)](https://hub.docker.com/r/yorkian/akdn)
+[![Docker Hub](https://img.shields.io/docker/v/yorkian/kore?label=Docker%20Hub)](https://hub.docker.com/r/yorkian/kore)
 
 ### Pull from Docker Hub (Recommended)
 
 ```bash
-docker run -d --name akdn --restart unless-stopped -p 3060:3060 -v akdn-data:/app/data yorkian/akdn:latest
+docker run -d --name kore --restart unless-stopped -p 3060:3060 -v kore-data:/app/data yorkian/kore:latest
 ```
 OR
 ```bash
-mkdir akdn && cd akdn
-curl -fsSL https://raw.githubusercontent.com/Yorkian/AKDN/main/docker-compose.yml -o docker-compose.yml
+mkdir kore && cd kore
+curl -fsSL https://raw.githubusercontent.com/Yorkian/kore/main/docker-compose.yml -o docker-compose.yml
 docker compose up -d
 ```
 Encryption keys are auto-generated on first run and persisted in the data volume. Zero configuration needed.
@@ -139,29 +139,29 @@ Encryption keys are auto-generated on first run and persisted in the data volume
 ### Build Locally
 
 ```bash
-git clone https://github.com/Yorkian/AKDN.git && cd AKDN
+git clone https://github.com/Yorkian/kore.git && cd kore
 docker compose -f docker-compose.build.yml up -d
 ```
 
 ### Manage
 
 ```bash
-docker logs -f akdn               # View logs
-docker restart akdn               # Restart
-docker stop akdn && docker rm akdn        # Stop&Delate
-docker pull yorkian/akdn:latest && docker stop akdn && docker rm akdn && docker run -d --name akdn --restart unless-stopped -p 3060:3060 -v akdn-data:/app/data yorkian/akdn:latest   # Update to latest
+docker logs -f kore               # View logs
+docker restart kore               # Restart
+docker stop kore && docker rm kore        # Stop&Delate
+docker pull yorkian/kore:latest && docker stop kore && docker rm kore && docker run -d --name kore --restart unless-stopped -p 3060:3060 -v kore-data:/app/data yorkian/kore:latest   # Update to latest
 ```
 OR
 ```bash
 docker compose up -d            # Start
-docker compose logs -f akdn           # View logs
+docker compose logs -f kore           # View logs
 docker compose down              Stop
 docker compose pull && docker compose up -d              # Update to latest
 ```
 
-Data and keys are persisted in Docker volume `akdn-data`.
+Data and keys are persisted in Docker volume `kore-data`.
 
-> **Note:** You can also provide your own keys via environment variables (`AKDN_ENCRYPTION_KEY`, `JWT_SECRET`) if needed. Auto-generated keys are stored in `/app/data/.akdn-keys.json` inside the volume.
+> **Note:** You can also provide your own keys via environment variables (`kore_ENCRYPTION_KEY`, `JWT_SECRET`) if needed. Auto-generated keys are stored in `/app/data/.kore-keys.json` inside the volume.
 
 ## Configuration
 
@@ -171,8 +171,8 @@ Data and keys are persisted in Docker volume `akdn-data`.
 |----------|---------|-------------|
 | `PORT` | `3060` | Server port |
 | `HOST` | `0.0.0.0` | Listen address |
-| `DB_PATH` | `./data/akdn.db` | SQLite database path |
-| `AKDN_ENCRYPTION_KEY` | (auto-generated) | AES-256 key for encrypting stored API keys |
+| `DB_PATH` | `./data/kore.db` | SQLite database path |
+| `kore_ENCRYPTION_KEY` | (auto-generated) | AES-256 key for encrypting stored API keys |
 | `JWT_SECRET` | (auto-generated) | JWT signing secret |
 | `IPINFO_TOKEN` | (optional) | ipinfo.io token (fallback GeoIP source) |
 | `FIRST_TOKEN_TIMEOUT` | `15000` | Streaming first-token timeout (ms) |
@@ -180,14 +180,14 @@ Data and keys are persisted in Docker volume `akdn-data`.
 | `HEALTH_CHECK_INTERVAL` | `60000` | Fault pool health check interval (ms) |
 | `GEO_CACHE_TTL` | `604800000` | GeoIP cache TTL (ms, default 7 days) |
 
-> ⚠️ **Important:** `AKDN_ENCRYPTION_KEY` is generated on first run. Do not change it after storing API keys, or they will become undecryptable. Back up your `.env` file.
+> ⚠️ **Important:** `kore_ENCRYPTION_KEY` is generated on first run. Do not change it after storing API keys, or they will become undecryptable. Back up your `.env` file.
 
 ### Nginx Reverse Proxy (Optional)
 
 ```nginx
 server {
     listen 443 ssl;
-    server_name akdn.example.com;
+    server_name kore.example.com;
 
     ssl_certificate /path/to/cert.pem;
     ssl_certificate_key /path/to/key.pem;
@@ -210,8 +210,8 @@ server {
 
 ### Request Flow
 
-1. Client sends request to AKDN's `/v1/chat/completions` with Bearer key0
-2. AKDN validates key0 → finds the linked strategy
+1. Client sends request to kore's `/v1/chat/completions` with Bearer key0
+2. kore validates key0 → finds the linked strategy
 3. Strategy-level quota check
 4. Scheduler selects a provider (priority or round-robin, skipping fault/throttled)
 5. Provider-level quota check
@@ -237,7 +237,7 @@ server {
 
 ## API Compatibility
 
-AKDN exposes OpenAI-compatible endpoints:
+kore exposes OpenAI-compatible endpoints:
 
 ```
 POST /v1/chat/completions    ← Main endpoint (streaming & non-streaming)
@@ -247,13 +247,13 @@ GET  /v1/models              ← Lists available models
 
 ### Usage in Downstream Apps
 
-After creating a strategy, AKDN generates a key (e.g., `akdn-a1b2c3d4...`). Use it like an OpenAI key:
+After creating a strategy, kore generates a key (e.g., `kore-a1b2c3d4...`). Use it like an OpenAI key:
 
 **OpenClaw / Clawd:**
 ```json
 {
   "baseUrl": "https://your-server:3060/v1",
-  "apiKey": "akdn-a1b2c3d4...",
+  "apiKey": "kore-a1b2c3d4...",
   "api": "openai-completions"
 }
 ```
@@ -263,12 +263,12 @@ After creating a strategy, AKDN generates a key (e.g., `akdn-a1b2c3d4...`). Use 
 **cURL:**
 ```bash
 curl https://your-server:3060/v1/chat/completions \
-  -H "Authorization: Bearer akdn-a1b2c3d4..." \
+  -H "Authorization: Bearer kore-a1b2c3d4..." \
   -H "Content-Type: application/json" \
-  -d '{"model":"akdn","messages":[{"role":"user","content":"hello"}]}'
+  -d '{"model":"kore","messages":[{"role":"user","content":"hello"}]}'
 ```
 
-> Note: The `model` parameter can be anything — AKDN overrides it with the provider's configured model.
+> Note: The `model` parameter can be anything — kore overrides it with the provider's configured model.
 
 ## Tech Stack
 
@@ -282,7 +282,7 @@ curl https://your-server:3060/v1/chat/completions \
 ## Project Structure
 
 ```
-akdn/
+kore/
 ├── src/                    # Backend TypeScript source
 │   ├── index.ts            # Fastify server entry
 │   ├── config.ts           # Environment configuration
@@ -304,14 +304,14 @@ akdn/
 ## Uninstall
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Yorkian/AKDN/main/uninstall.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/Yorkian/kore/main/uninstall.sh | sudo bash
 ```
 
 Or manually:
 
 ```bash
-pm2 delete akdn && pm2 save
-rm -rf /opt/akdn
+pm2 delete kore && pm2 save
+rm -rf /opt/kore
 ```
 
 ## Buy Me a Coffee（USDT）
@@ -334,5 +334,5 @@ The producer has tried their best to ensure the quality of the project, however,
 ---
 
 <p align="center">
-  <a href="https://github.com/Yorkian/AKDN">GitHub</a>
+  <a href="https://github.com/Yorkian/kore">GitHub</a>
 </p>

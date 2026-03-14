@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * AKDN Setup — Generate permanent encryption keys
+ * kore Setup — Generate permanent encryption keys
  * Run: node setup-keys.js
  */
 const crypto = require('crypto');
@@ -12,7 +12,7 @@ const examplePath = path.join(__dirname, '.env.example');
 
 console.log('');
 console.log('╔════════════════════════════════════════════╗');
-console.log('║    AKDN — 密钥生成工具                     ║');
+console.log('║    kore — 密钥生成工具                     ║');
 console.log('╚════════════════════════════════════════════╝');
 console.log('');
 
@@ -21,7 +21,7 @@ const jwtKey = crypto.randomBytes(32).toString('hex');
 
 console.log('生成的密钥：');
 console.log('');
-console.log(`  AKDN_ENCRYPTION_KEY=${encKey}`);
+console.log(`  kore_ENCRYPTION_KEY=${encKey}`);
 console.log(`  JWT_SECRET=${jwtKey}`);
 console.log('');
 
@@ -31,8 +31,8 @@ if (fs.existsSync(envPath)) {
   let changed = false;
 
   // Only fill empty values, don't overwrite existing
-  if (content.match(/AKDN_ENCRYPTION_KEY=\s*$/m) || content.match(/AKDN_ENCRYPTION_KEY=\s*\n/)) {
-    content = content.replace(/AKDN_ENCRYPTION_KEY=\s*/m, `AKDN_ENCRYPTION_KEY=${encKey}`);
+  if (content.match(/kore_ENCRYPTION_KEY=\s*$/m) || content.match(/kore_ENCRYPTION_KEY=\s*\n/)) {
+    content = content.replace(/kore_ENCRYPTION_KEY=\s*/m, `kore_ENCRYPTION_KEY=${encKey}`);
     changed = true;
   }
   if (content.match(/JWT_SECRET=\s*$/m) || content.match(/JWT_SECRET=\s*\n/)) {
@@ -50,12 +50,12 @@ if (fs.existsSync(envPath)) {
   // Create .env from example
   if (fs.existsSync(examplePath)) {
     let content = fs.readFileSync(examplePath, 'utf-8');
-    content = content.replace(/AKDN_ENCRYPTION_KEY=\s*/m, `AKDN_ENCRYPTION_KEY=${encKey}`);
+    content = content.replace(/kore_ENCRYPTION_KEY=\s*/m, `kore_ENCRYPTION_KEY=${encKey}`);
     content = content.replace(/JWT_SECRET=\s*/m, `JWT_SECRET=${jwtKey}`);
     fs.writeFileSync(envPath, content);
     console.log('✅ 已从 .env.example 创建 .env 文件并写入密钥');
   } else {
-    const content = `AKDN_ENCRYPTION_KEY=${encKey}\nJWT_SECRET=${jwtKey}\n`;
+    const content = `kore_ENCRYPTION_KEY=${encKey}\nJWT_SECRET=${jwtKey}\n`;
     fs.writeFileSync(envPath, content);
     console.log('✅ 已创建 .env 文件并写入密钥');
   }

@@ -84,8 +84,7 @@ async function main() {
   await app.listen({ port: config.port, host: config.host });
   console.log(`
 ╔════════════════════════════════════════════╗
-║          AKDN - AI API Key                ║
-║          Delivery Network                 ║
+║          kore - AI API Proxy              ║
 ║                                           ║
 ║  🌐 http://${config.host}:${config.port}              ║
 ║  📊 Dashboard: http://localhost:${config.port}     ║

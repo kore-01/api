@@ -54,15 +54,15 @@ function ensureSecret(key: string, keysFilePath: string): string {
   return generated;
 }
 
-const dbPath = getEnv('DB_PATH', './data/akdn.db');
+const dbPath = getEnv('DB_PATH', './data/kore.db');
 const dataDir = path.dirname(dbPath);
-const keysFilePath = path.join(dataDir, '.akdn-keys.json');
+const keysFilePath = path.join(dataDir, '.kore-keys.json');
 
 export const config = {
   port: getEnvInt('PORT', 3060),
   host: getEnv('HOST', '0.0.0.0'),
   dbPath,
-  encryptionKey: ensureSecret('AKDN_ENCRYPTION_KEY', keysFilePath),
+  encryptionKey: ensureSecret('KORE_ENCRYPTION_KEY', keysFilePath),
   jwtSecret: ensureSecret('JWT_SECRET', keysFilePath),
   ipinfoToken: process.env.IPINFO_TOKEN || '',
   firstTokenTimeout: getEnvInt('FIRST_TOKEN_TIMEOUT', 15000),

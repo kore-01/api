@@ -2,15 +2,15 @@
 set -e
 
 # ============================================================================
-#  AKDN — AI API Key Delivery Network
+#  kore — AI API Proxy
 #  One-click Install Script
-#  https://github.com/Yorkian/AKDN
+#  https://github.com/kore-01/api
 # ============================================================================
 
-INSTALL_DIR="/opt/akdn"
-AKDN_PORT=3060
+INSTALL_DIR="/opt/kore"
+${KORE_PORT}=3060
 NODE_MIN_VERSION=18
-REPO_URL="https://github.com/Yorkian/AKDN.git"
+REPO_URL="https://github.com/kore-01/api.git"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -20,8 +20,8 @@ NC='\033[0m'
 
 echo ""
 echo -e "${CYAN}╔════════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║      AKDN — AI API Key Delivery Network   ║${NC}"
-echo -e "${CYAN}║      One-click Installer                   ║${NC}"
+echo -e "${CYAN}║           kore - AI API Proxy             ║${NC}"
+echo -e "${CYAN}║           One-click Installer             ║${NC}"
 echo -e "${CYAN}╚════════════════════════════════════════════╝${NC}"
 echo ""
 
@@ -135,7 +135,7 @@ fi
 echo -e "${GREEN}✓ PM2 $(pm2 -v)${NC}"
 
 # ---- Clone or update project ----
-echo -e "${CYAN}[4/7] Downloading AKDN...${NC}"
+echo -e "${CYAN}[4/7] Downloading kore...${NC}"
 if [ -d "$INSTALL_DIR/.git" ]; then
   echo -e "${YELLOW}Existing installation found. Updating...${NC}"
   cd "$INSTALL_DIR"
@@ -167,7 +167,7 @@ else
   echo -e "${GREEN}✓ .env exists, keeping current configuration${NC}"
 fi
 
-pm2 delete akdn 2>/dev/null || true
+pm2 delete kore 2>/dev/null || true
 pm2 start ecosystem.config.js
 pm2 save
 pm2 startup 2>/dev/null || true
@@ -176,25 +176,25 @@ pm2 startup 2>/dev/null || true
 sleep 3
 SERVER_IP=$(hostname -I 2>/dev/null | awk '{print $1}' || echo "your-server-ip")
 
-if curl -s -o /dev/null -w "%{http_code}" "http://localhost:${AKDN_PORT}/api/auth/status" 2>/dev/null | grep -q "200"; then
+if curl -s -o /dev/null -w "%{http_code}" "http://localhost:${KORE_PORT}/api/auth/status" 2>/dev/null | grep -q "200"; then
   echo ""
   echo -e "${GREEN}╔════════════════════════════════════════════════╗${NC}"
-  echo -e "${GREEN}║        ✅ AKDN installed successfully!         ║${NC}"
+  echo -e "${GREEN}║        ✅ kore installed successfully!         ║${NC}"
   echo -e "${GREEN}╚════════════════════════════════════════════════╝${NC}"
   echo ""
-  echo -e "  ${CYAN}Dashboard:${NC}   http://${SERVER_IP}:${AKDN_PORT}"
+  echo -e "  ${CYAN}Dashboard:${NC}   http://${SERVER_IP}:${KORE_PORT}"
   echo -e "  ${CYAN}Install dir:${NC} ${INSTALL_DIR}"
-  echo -e "  ${CYAN}Manage:${NC}      pm2 status / pm2 logs akdn / pm2 restart akdn"
+  echo -e "  ${CYAN}Manage:${NC}      pm2 status / pm2 logs kore / pm2 restart kore"
   echo ""
   echo -e "  ${YELLOW}First visit the dashboard to create your admin account.${NC}"
   echo ""
-  echo -e "  ${CYAN}https://github.com/Yorkian/AKDN${NC}"
+  echo -e "  ${CYAN}https://github.com/kore-01/api${NC}"
   echo ""
 else
   echo ""
   echo -e "${RED}⚠ Service may not have started correctly.${NC}"
-  echo -e "  Check logs: ${CYAN}pm2 logs akdn --lines 20${NC}"
+  echo -e "  Check logs: ${CYAN}pm2 logs kore --lines 20${NC}"
   echo ""
-  echo -e "  ${CYAN}https://github.com/Yorkian/AKDN${NC}"
+  echo -e "  ${CYAN}https://github.com/kore-01/api${NC}"
   echo ""
 fi

@@ -1,6 +1,6 @@
 # ============================================================================
-#  AKDN — AI API Key Delivery Network
-#  https://github.com/Yorkian/AKDN
+#  kore — AI API Key Delivery Network
+#  https://github.com/Yorkian/kore
 # ============================================================================
 
 # Stage 1: Build frontend
@@ -26,11 +26,11 @@ RUN rm -rf node_modules && npm ci --omit=dev
 # Stage 3: Minimal production image
 FROM node:20-slim
 
-LABEL org.opencontainers.image.title="AKDN" \
+LABEL org.opencontainers.image.title="kore" \
       org.opencontainers.image.description="AI API Key Delivery Network — Self-hosted AI API gateway with provider failover, load balancing, and usage quotas" \
-      org.opencontainers.image.url="https://github.com/Yorkian/AKDN" \
-      org.opencontainers.image.source="https://github.com/Yorkian/AKDN" \
-      org.opencontainers.image.documentation="https://github.com/Yorkian/AKDN#readme" \
+      org.opencontainers.image.url="https://github.com/Yorkian/kore" \
+      org.opencontainers.image.source="https://github.com/Yorkian/kore" \
+      org.opencontainers.image.documentation="https://github.com/Yorkian/kore#readme" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.vendor="Yorkian"
 
@@ -50,7 +50,7 @@ RUN mkdir -p /app/data
 ENV NODE_ENV=production \
     PORT=3060 \
     HOST=0.0.0.0 \
-    DB_PATH=/app/data/akdn.db
+    DB_PATH=/app/data/kore.db
 
 EXPOSE 3060
 
