@@ -16,7 +16,9 @@ import { config } from '../config';
  * Responses: {"type":"response.output_text.delta","delta":"...","item_id":"...","output_index":...}
  */
 function transformToResponsesDelta(data: any, itemId: string = 'msg_1'): any {
+  console.log('[DEBUG] transformToResponsesDelta input:', JSON.stringify(data).substring(0, 300));
   const delta = data.choices?.[0]?.delta;
+  console.log('[DEBUG] delta found:', !!delta, 'delta:', JSON.stringify(delta).substring(0, 100));
   if (!delta) return null;
 
   const result: any = {
@@ -411,7 +413,7 @@ async function proxyToProvider(
             const chunk = decoder.decode(value, { stream: true });
 
             // Transform chunk to responses format
-            console.log('[DEBUG] Processing streaming chunk, chunk length:', chunk.length);
+            console.log('[DEBUG] Processing streaming chunk, raw data:', chunk.substring(0, 200));
             const lines = extractSSELines(chunk);
             console.log('[DEBUG] SSE lines extracted:', lines.length);
             const transformedLines: string[] = [];
