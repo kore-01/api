@@ -162,6 +162,23 @@ async function proxyToProvider(
   // Debug: Log tools and tool_calls if present
   if (forwardBody.tools) {
     console.log('[DEBUG] Tools present:', JSON.stringify(forwardBody.tools).substring(0, 500));
+
+    // Convert tools format from flat to nested function object
+    // OpenCode: {"type":"function","name":"...","description":"...","parameters":{...}}
+    // Required: {"type":"function","function":{"name":"...","description":"...","parameters":{...}}}
+    for (const tool of forwardBody.tools) {
+      if (tool.type === 'function' && !tool.function && tool.name) {
+        console.log('[DEBUG] Converting flat tools format to nested function');
+        tool.function = {
+          name: tool.name,
+          description: tool.description,
+          parameters: tool.parameters
+        };
+        delete tool.name;
+        delete tool.description;
+        delete tool.parameters;
+      }
+    }
   }
   if (forwardBody.tool_calls) {
     console.log('[DEBUG] Tool_calls present:', JSON.stringify(forwardBody.tool_calls).substring(0, 500));
