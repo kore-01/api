@@ -51,9 +51,6 @@ export async function initDb(): Promise<void> {
       updated_at TEXT DEFAULT (datetime('now'))
     );
 
-    -- Add custom_headers column if not exists (for existing databases)
-    ALTER TABLE providers ADD COLUMN custom_headers TEXT DEFAULT '';
-
     CREATE TABLE IF NOT EXISTS settings (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
