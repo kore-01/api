@@ -10,6 +10,67 @@ import { extractSSELines, parseSSEData } from '../utils/stream-handler';
 import { proxyFetch } from '../utils/proxy-fetch';
 import { config } from '../config';
 
+/**
+ * Transform chat.completion response to responses API format
+ * Chat: {"choices":[{"message":{"content":"..."}}]}
+ * Responses: {"output":[{"type":"output_text","content":[{"type":"output_text","text":"..."}]}]}
+ */
+function transformToResponsesFormat(data: any): any {
+  const message = data.choices?.[0]?.message;
+  const content = message?.content || '';
+  const toolCalls = message?.tool_calls || [];
+
+  // Generate a unique item_id
+  const itemId = `msg_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
+  const output: any[] = [];
+
+  // Add text content if present
+  if (content) {
+    output.push({
+      type: 'message',
+      role: 'assistant',
+      content: [
+        {
+          type: 'output_text',
+          text: content
+        }
+      ]
+    });
+  }
+
+  // Add tool calls if present
+  if (toolCalls && toolCalls.length > 0) {
+    const toolCallsOutput = toolCalls.map((tc: any, index: number) => ({
+      type: 'tool_use',
+      id: tc.id || `toolu_${Date.now()}_${index}`,
+      name: tc.function?.name || '',
+      input: typeof tc.function?.arguments === 'string'
+        ? JSON.parse(tc.function.arguments)
+        : tc.function?.arguments || {}
+    }));
+
+    output.push({
+      type: 'message',
+      role: 'assistant',
+      content: toolCallsOutput
+    });
+  }
+
+  return {
+    id: data.id || `resp_${Date.now()}`,
+    object: 'response',
+    created: data.created || Math.floor(Date.now() / 1000),
+    model: data.model || 'unknown',
+    output: output,
+    usage: data.usage ? {
+      input_tokens: data.usage.prompt_tokens || 0,
+      output_tokens: data.usage.completion_tokens || 0,
+      total_tokens: data.usage.total_tokens || 0
+    } : undefined
+  };
+}
+
 function estimateTokens(text: string): number {
   if (!text) return 0;
   return Math.ceil(text.length / 3.5);
@@ -311,7 +372,17 @@ async function proxyToProvider(
       };
     } else {
       const data = await res.json() as any;
-      const resBody = JSON.stringify(data);
+
+      // Transform response from chat.completion to responses format for OpenCode
+      let resBody: string;
+      if (requestPath === '/v1/responses') {
+        const transformed = transformToResponsesFormat(data);
+        resBody = JSON.stringify(transformed);
+        console.log('[DEBUG] Transformed response to responses format');
+      } else {
+        resBody = JSON.stringify(data);
+      }
+
       if (!reply.raw.headersSent) {
         reply.raw.writeHead(200, { 'Content-Type': 'application/json' });
         reply.raw.end(resBody);
