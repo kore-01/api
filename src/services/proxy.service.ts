@@ -18,8 +18,13 @@ import { config } from '../config';
 function transformToResponsesDelta(data: any, itemId: string = 'msg_1'): any {
   console.log('[DEBUG] transformToResponsesDelta input:', JSON.stringify(data).substring(0, 300));
   const delta = data.choices?.[0]?.delta;
-  console.log('[DEBUG] delta found:', !!delta, 'delta:', JSON.stringify(delta).substring(0, 100));
+  console.log('[DEBUG] delta found:', !!delta, 'delta:', JSON.stringify(delta || {}).substring(0, 100));
+
+  // If no delta or delta has no content and no tool_calls, skip this chunk
   if (!delta) return null;
+  if (!delta.content && !delta.role && (!delta.tool_calls || delta.tool_calls.length === 0)) {
+    return null;
+  }
 
   const result: any = {
     type: 'response.output_text.delta',

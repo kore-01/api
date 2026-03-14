@@ -1,8 +1,8 @@
 {
   "env": {
-    "ANTHROPIC_API_KEY": "sk-cp-UopoOVyZO_GbyPm-QVWoyE-1xOPavGi_ZoXUGfPrh0IfZMged6Er0X8h8eoc_-zTwcjZSP_PztisbNb2_A8wNDpSp0-b5ZoroBqpbe-3DM5fUDdZGfEqFxI",
-    "ANTHROPIC_AUTH_TOKEN": "sk-cp-UopoOVyZO_GbyPm-QVWoyE-1xOPavGi_ZoXUGfPrh0IfZMged6Er0X8h8eoc_-zTwcjZSP_PztisbNb2_A8wNDpSp0-b5ZoroBqpbe-3DM5fUDdZGfEqFxI",
-    "ANTHROPIC_BASE_URL": "https://api.minimaxi.com/anthropic",
+    "ANTHROPIC_API_KEY": "00feb7a9fac745129b6cf7ce493012b1.X2wzPsoC0JgXpJF3",
+    "ANTHROPIC_AUTH_TOKEN": "00feb7a9fac745129b6cf7ce493012b1.X2wzPsoC0JgXpJF3",
+    "ANTHROPIC_BASE_URL": "https://open.bigmodel.cn/api/anthropic",
     "DISABLE_AUTOUPDATER": 1,
     "IS_SANDBOX": "1"
   },
