@@ -53,6 +53,26 @@ export const PROVIDER_PRESETS = [
     api_type: 'anthropic-messages',
     model_id: 'MiniMax-M2.5-highspeed',
   },
+  {
+    name: 'Kimi-for-coding',
+    base_url: 'https://api.kimi.com/coding/v1',
+    api_type: 'openai-completions',
+    model_id: 'kimi-2.5',
+    custom_headers: JSON.stringify({
+      'user-agent': 'RooCode/3.31.0',
+      'x-title': 'Roo Code',
+      'accept': 'application/json',
+      'accept-language': '*',
+      'sec-fetch-mode': 'cors',
+      'x-stainless-arch': 'x64',
+      'x-stainless-lang': 'js',
+      'x-stainless-os': 'Windows',
+      'x-stainless-package-version': '5.12.2',
+      'x-stainless-retry-count': '0',
+      'x-stainless-runtime': 'node',
+      'x-stainless-runtime-version': 'v22.19.0',
+    }),
+  },
 ];
 
 export const HEALTH_THRESHOLDS = {

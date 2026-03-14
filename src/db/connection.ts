@@ -43,12 +43,16 @@ export async function initDb(): Promise<void> {
       prompt_tokens_used INTEGER DEFAULT 0,
       completion_tokens_used INTEGER DEFAULT 0,
       proxy_url TEXT DEFAULT '',
+      custom_headers TEXT DEFAULT '',
       health_reset_at TEXT DEFAULT '',
       status TEXT DEFAULT 'normal' CHECK(status IN ('normal','fault','throttled')),
       is_active INTEGER DEFAULT 1,
       created_at TEXT DEFAULT (datetime('now')),
       updated_at TEXT DEFAULT (datetime('now'))
     );
+
+    -- Add custom_headers column if not exists (for existing databases)
+    ALTER TABLE providers ADD COLUMN custom_headers TEXT DEFAULT '';
 
     CREATE TABLE IF NOT EXISTS settings (
       key TEXT PRIMARY KEY,

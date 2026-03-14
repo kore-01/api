@@ -174,6 +174,7 @@ export async function providerRoutes(app: FastifyInstance): Promise<void> {
       api_type: source.api_type,
       model_id: source.model_id,
       proxy_url: source.proxy_url || '',
+      custom_headers: source.custom_headers || '',
       prompt_token_limit: source.prompt_token_limit,
       completion_token_limit: source.completion_token_limit,
     });

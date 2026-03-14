@@ -11,6 +11,7 @@ export interface Provider {
   model_id: string;
   model_name: string;
   proxy_url: string;
+  custom_headers: string;  // JSON string of custom headers
   prompt_token_limit: number;
   completion_token_limit: number;
   prompt_tokens_used: number;
@@ -29,6 +30,7 @@ export interface CreateProviderInput {
   api_type?: string;
   model_id: string;
   proxy_url?: string;
+  custom_headers?: string;
   prompt_token_limit?: number;
   completion_token_limit?: number;
 }
@@ -65,13 +67,14 @@ export function createProvider(input: CreateProviderInput): Provider {
 
   db.prepare(`
     INSERT INTO providers (id, name, base_url, api_key, api_type, model_id, model_name,
-      proxy_url, prompt_token_limit, completion_token_limit, health_reset_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      proxy_url, custom_headers, prompt_token_limit, completion_token_limit, health_reset_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     id, input.name, input.base_url, encryptedKey,
     input.api_type || 'openai-completions',
     input.model_id, modelName,
     input.proxy_url || '',
+    input.custom_headers || '',
     input.prompt_token_limit || 0,
     input.completion_token_limit || 0,
     now,
@@ -100,6 +103,7 @@ export function updateProvider(id: string, input: Partial<CreateProviderInput> &
     updates.push('model_name = ?'); values.push(input.model_id); // sync
   }
   if (input.proxy_url !== undefined) { updates.push('proxy_url = ?'); values.push(input.proxy_url); }
+  if (input.custom_headers !== undefined) { updates.push('custom_headers = ?'); values.push(input.custom_headers); }
   if (input.prompt_token_limit !== undefined) { updates.push('prompt_token_limit = ?'); values.push(input.prompt_token_limit); }
   if (input.completion_token_limit !== undefined) { updates.push('completion_token_limit = ?'); values.push(input.completion_token_limit); }
 

@@ -81,6 +81,11 @@
             <p class="text-[10px] text-dark-500 mt-1">{{ t('prov.proxy_protocols') }}</p>
           </div>
           <div class="border-t border-dark-700/50 pt-3">
+            <label class="label">Custom Headers <span class="text-dark-500 font-normal">(JSON)</span></label>
+            <textarea v-model="form.custom_headers" class="input font-mono text-xs h-24" placeholder='{"x-title": "Roo Code", "user-agent": "RooCode/3.31.0"}'></textarea>
+            <p class="text-[10px] text-dark-500 mt-1">Required for Kimi-for-coding and similar APIs</p>
+          </div>
+          <div class="border-t border-dark-700/50 pt-3">
             <p class="text-sm font-medium text-dark-300 mb-2">{{ t('prov.quota_title') }}</p>
             <div class="grid grid-cols-2 gap-3">
               <div><label class="label">{{ t('prov.prompt_limit') }}</label><input v-model.number="form.prompt_token_limit" type="number" class="input" /></div>
@@ -101,7 +106,7 @@ import { useI18n } from '../stores/i18n';
 const { t } = useI18n();
 const providers = ref<any[]>([]); const presets = ref<any[]>([]); const showForm = ref(false); const editingId = ref<string|null>(null); const showKey = ref(false); const saving = ref(false); const formError = ref('');
 const testModal = ref(false); const testLoading = ref(false); const testSteps = ref<any[]>([]);
-const form = ref({ name:'',base_url:'',api_key:'',api_type:'openai-completions',model_id:'',proxy_url:'',prompt_token_limit:0,completion_token_limit:0 });
+const form = ref({ name:'',base_url:'',api_key:'',api_type:'openai-completions',model_id:'',proxy_url:'',custom_headers:'',prompt_token_limit:0,completion_token_limit:0 });
 function statusBadge(s:string) { return s==='fault'?'badge-red':s==='throttled'?'badge-orange':'badge-green'; }
 function statusLabel(s:string) { return s==='fault'?t('prov.status_fault'):s==='throttled'?t('prov.status_throttled'):t('prov.status_normal'); }
 function stepName(step:any):string {
@@ -128,8 +133,8 @@ function lineLabel(key:string):string {
 }
 function usageColor(u:number,l:number) { const p=(u/l)*100; return p>=90?'bg-red-500':p>=70?'bg-amber-500':'bg-primary-500'; }
 function maskProxy(url:string) { try { const u=new URL(url); if(u.password) u.password='***'; return u.toString(); } catch { return url; } }
-function openForm(p?:any) { formError.value=''; showKey.value=false; if(p){editingId.value=p.id;form.value={name:p.name,base_url:p.base_url,api_key:'',api_type:p.api_type,model_id:p.model_id,proxy_url:p.proxy_url||'',prompt_token_limit:p.prompt_token_limit,completion_token_limit:p.completion_token_limit};}else{editingId.value=null;form.value={name:'',base_url:'',api_key:'',api_type:'openai-completions',model_id:'',proxy_url:'',prompt_token_limit:0,completion_token_limit:0};} showForm.value=true; }
-function applyPreset(p:any) { form.value.name=p.name;form.value.base_url=p.base_url;form.value.api_type=p.api_type;form.value.model_id=p.model_id; }
+function openForm(p?:any) { formError.value=''; showKey.value=false; if(p){editingId.value=p.id;form.value={name:p.name,base_url:p.base_url,api_key:'',api_type:p.api_type,model_id:p.model_id,proxy_url:p.proxy_url||'',custom_headers:p.custom_headers||'',prompt_token_limit:p.prompt_token_limit,completion_token_limit:p.completion_token_limit};}else{editingId.value=null;form.value={name:'',base_url:'',api_key:'',api_type:'openai-completions',model_id:'',proxy_url:'',custom_headers:'',prompt_token_limit:0,completion_token_limit:0};} showForm.value=true; }
+function applyPreset(p:any) { form.value.name=p.name;form.value.base_url=p.base_url;form.value.api_type=p.api_type;form.value.model_id=p.model_id;form.value.custom_headers=p.custom_headers||''; }
 async function loadProviders() { try{providers.value=await api('/api/providers');}catch{} }
 async function loadPresets() { try{presets.value=await api('/api/providers/presets');}catch{} }
 async function saveProvider() { formError.value=''; const data:any={...form.value}; if(editingId.value&&!data.api_key) delete data.api_key; saving.value=true; try { if(editingId.value){await api(`/api/providers/${editingId.value}`,{method:'PUT',body:JSON.stringify(data)});}else{await api('/api/providers',{method:'POST',body:JSON.stringify(data)});} showForm.value=false; loadProviders(); } catch(err:any){formError.value=err.message;} finally{saving.value=false;} }
