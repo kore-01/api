@@ -41,6 +41,12 @@ export async function proxyRoutes(app: FastifyInstance): Promise<void> {
         owned_by: 'anthropic',
       },
       {
+        id: 'claude-sonnet-4-6[1m][1m]',  // Claude Code adds extra suffix
+        object: 'model',
+        created: 1234567890,
+        owned_by: 'anthropic',
+      },
+      {
         id: 'claude-sonnet-4-6',
         object: 'model',
         created: 1234567890,
@@ -48,6 +54,12 @@ export async function proxyRoutes(app: FastifyInstance): Promise<void> {
       },
       {
         id: 'claude-opus-4-6[1m]',
+        object: 'model',
+        created: 1234567890,
+        owned_by: 'anthropic',
+      },
+      {
+        id: 'claude-opus-4-6[1m][1m]',  // Claude Code adds extra suffix
         object: 'model',
         created: 1234567890,
         owned_by: 'anthropic',
