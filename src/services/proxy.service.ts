@@ -135,6 +135,14 @@ async function proxyToProvider(
   // ** CRITICAL: Override user's model with provider's model_id **
   let forwardBody = { ...body, model: provider.model_id };
 
+  // Convert /v1/responses format to /chat/completions format
+  // OpenCode sends "input" but providers need "messages"
+  if (requestPath === '/v1/responses' && forwardBody.input && !forwardBody.messages) {
+    forwardBody.messages = forwardBody.input;
+    delete forwardBody.input;
+    console.log('[DEBUG] Converted responses input to messages:', JSON.stringify(forwardBody.messages));
+  }
+
   // Convert message format for Anthropic API
   if (useAnthropicFormat) {
     forwardBody = convertToAnthropicFormat(forwardBody);
