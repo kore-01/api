@@ -35,7 +35,19 @@ export async function proxyRoutes(app: FastifyInstance): Promise<void> {
     // The actual model will be overridden by the provider's model_id anyway
     const models = [
       {
+        id: 'claude-sonnet-4-6[1m]',
+        object: 'model',
+        owned_by: 'anthropic',
+        created: 1234567890,
+      },
+      {
         id: 'claude-sonnet-4-6',
+        object: 'model',
+        owned_by: 'anthropic',
+        created: 1234567890,
+      },
+      {
+        id: 'claude-opus-4-6[1m]',
         object: 'model',
         owned_by: 'anthropic',
         created: 1234567890,
