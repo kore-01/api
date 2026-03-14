@@ -369,6 +369,7 @@ async function proxyToProvider(
 
     if (isResponsesFormat) {
       // Always use streaming format for responses API
+      console.log('[DEBUG] Entering responses format branch, isStream:', isStream, 'res.body:', !!res.body);
       const itemId = `msg_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
       reply.raw.writeHead(200, {
@@ -393,7 +394,9 @@ async function proxyToProvider(
             const chunk = decoder.decode(value, { stream: true });
 
             // Transform chunk to responses format
+            console.log('[DEBUG] Processing streaming chunk, chunk length:', chunk.length);
             const lines = extractSSELines(chunk);
+            console.log('[DEBUG] SSE lines extracted:', lines.length);
             const transformedLines: string[] = [];
 
             for (const line of lines) {
