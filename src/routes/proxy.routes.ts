@@ -47,29 +47,10 @@ export async function proxyRoutes(app: FastifyInstance): Promise<void> {
     }
 
     // Return standard Claude model names
-    // The actual model will be overridden by provider's model_id
-    // 590 API will handle the real model mapping
+    // Single model for simplicity - 590 API handles real model mapping
     const models = [
       {
         id: 'claude-sonnet-4-6',
-        object: 'model',
-        created: 1234567890,
-        owned_by: 'anthropic',
-      },
-      {
-        id: 'claude-opus-4-6',
-        object: 'model',
-        created: 1234567890,
-        owned_by: 'anthropic',
-      },
-      {
-        id: 'claude-3-5-sonnet-20241022',
-        object: 'model',
-        created: 1234567890,
-        owned_by: 'anthropic',
-      },
-      {
-        id: 'claude-3-5-haiku-20241022',
         object: 'model',
         created: 1234567890,
         owned_by: 'anthropic',
