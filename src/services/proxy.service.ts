@@ -507,6 +507,7 @@ export async function handleProxyRequest(
 
   const body = request.body as any || {};
   const isStream = body.stream === true;
+  console.log('[DEBUG] Request info - requestPath:', requestPath, 'isStream:', isStream, 'body.stream:', body.stream);
   const apiKeyId = (strategy as any).api_key_id || '';
 
   const triedProviderIds: string[] = [];
