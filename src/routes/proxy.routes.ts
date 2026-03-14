@@ -110,6 +110,37 @@ export async function proxyRoutes(app: FastifyInstance): Promise<void> {
         created: 1234567890,
         owned_by: 'Zhipu AI',
       },
+      // Short aliases for user convenience
+      {
+        id: 'opus[1m]',
+        object: 'model',
+        created: 1234567890,
+        owned_by: 'anthropic',
+      },
+      {
+        id: 'opus',
+        object: 'model',
+        created: 1234567890,
+        owned_by: 'anthropic',
+      },
+      {
+        id: 'sonnet[1m]',
+        object: 'model',
+        created: 1234567890,
+        owned_by: 'anthropic',
+      },
+      {
+        id: 'sonnet',
+        object: 'model',
+        created: 1234567890,
+        owned_by: 'anthropic',
+      },
+      {
+        id: 'haiku',
+        object: 'model',
+        created: 1234567890,
+        owned_by: 'anthropic',
+      },
     ];
 
     return { object: 'list', data: models };
