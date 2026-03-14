@@ -217,6 +217,7 @@ async function proxyToProvider(
   isStream: boolean,
 ): Promise<ProxyResult> {
   const startTime = Date.now();
+  console.log('[DEBUG] proxyToProvider called, requestPath:', requestPath);
 
   // Determine the correct API path based on api_type
   // Anthropic-compatible API uses /v1/messages instead of /chat/completions
