@@ -148,6 +148,17 @@ async function proxyToProvider(
     console.log('[DEBUG] Converted responses input to messages:', JSON.stringify(forwardBody.messages));
   }
 
+  // Convert "developer" role to "system" for provider compatibility
+  // OpenCode sends "developer" role but many providers don't support it
+  if (forwardBody.messages && Array.isArray(forwardBody.messages)) {
+    for (const msg of forwardBody.messages) {
+      if (msg.role === 'developer') {
+        msg.role = 'system';
+        console.log('[DEBUG] Converted developer role to system');
+      }
+    }
+  }
+
   // Convert message format for Anthropic API
   if (useAnthropicFormat) {
     forwardBody = convertToAnthropicFormat(forwardBody);
