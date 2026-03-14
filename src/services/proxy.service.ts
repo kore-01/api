@@ -350,9 +350,25 @@ async function proxyToProvider(
 
     if (!res.ok) {
       const errBody = await res.text().catch(() => '');
-      if (!reply.raw.headersSent) {
-        reply.raw.writeHead(res.status, { 'Content-Type': 'application/json' });
-        reply.raw.end(errBody);
+      // For responses API, still need to transform error response
+      if (requestPath === '/v1/responses') {
+        // Return error in responses format
+        const errorResponse = {
+          type: 'error',
+          error: {
+            type: 'provider_error',
+            message: errBody
+          }
+        };
+        if (!reply.raw.headersSent) {
+          reply.raw.writeHead(res.status, { 'Content-Type': 'application/json' });
+          reply.raw.end(JSON.stringify(errorResponse));
+        }
+      } else {
+        if (!reply.raw.headersSent) {
+          reply.raw.writeHead(res.status, { 'Content-Type': 'application/json' });
+          reply.raw.end(errBody);
+        }
       }
       return {
         success: true,
