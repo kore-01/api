@@ -404,6 +404,7 @@ async function proxyToProvider(
                 try {
                   const data = JSON.parse(line.substring(6));
                   const transformed = transformToResponsesDelta(data, itemId);
+                  console.log('[DEBUG] Transformed delta, result:', transformed ? 'success' : 'null');
                   if (transformed) {
                     transformedLines.push(`data: ${JSON.stringify(transformed)}`);
                   }
