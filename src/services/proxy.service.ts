@@ -268,7 +268,14 @@ async function proxyToProvider(
   // Convert /v1/responses format to /chat/completions format
   // OpenCode sends "input" but providers need "messages"
   if (requestPath === '/v1/responses' && forwardBody.input && !forwardBody.messages) {
-    forwardBody.messages = forwardBody.input;
+    // If input is a string, convert to messages array format
+    if (typeof forwardBody.input === 'string') {
+      forwardBody.messages = [{ role: 'user', content: forwardBody.input }];
+    } else if (Array.isArray(forwardBody.input)) {
+      forwardBody.messages = forwardBody.input;
+    } else {
+      forwardBody.messages = [{ role: 'user', content: String(forwardBody.input) }];
+    }
     delete forwardBody.input;
     console.log('[DEBUG] Converted responses input to messages:', JSON.stringify(forwardBody.messages));
   }
