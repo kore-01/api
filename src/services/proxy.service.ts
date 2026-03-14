@@ -46,31 +46,6 @@ function transformToResponsesDelta(data: any, itemId: string = 'msg_1'): any {
     console.error('[ERROR] transformToResponsesDelta failed:', e);
     return null;
   }
-
-  const result: any = {
-    type: 'response.output_text.delta',
-    delta: delta.content || '',
-    item_id: itemId,
-    output_index: 0
-  };
-
-  // Handle tool calls in streaming
-  if (delta.tool_calls && delta.tool_calls.length > 0) {
-    return {
-      type: 'response.tool_call.delta',
-      delta: {
-        tool_calls: delta.tool_calls.map((tc: any) => ({
-          id: tc.id || `toolu_${Date.now()}`,
-          name: tc.function?.name || '',
-          arguments: tc.function?.arguments || ''
-        }))
-      },
-      item_id: itemId,
-      output_index: 0
-    };
-  }
-
-  return result;
 }
 
 /**
