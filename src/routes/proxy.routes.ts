@@ -37,38 +37,51 @@ export async function proxyRoutes(app: FastifyInstance): Promise<void> {
       {
         id: 'claude-sonnet-4-6[1m]',
         object: 'model',
-        owned_by: 'anthropic',
         created: 1234567890,
+        owned_by: 'anthropic',
       },
       {
         id: 'claude-sonnet-4-6',
         object: 'model',
-        owned_by: 'anthropic',
         created: 1234567890,
+        owned_by: 'anthropic',
       },
       {
         id: 'claude-opus-4-6[1m]',
         object: 'model',
-        owned_by: 'anthropic',
         created: 1234567890,
+        owned_by: 'anthropic',
       },
       {
         id: 'claude-opus-4-6',
         object: 'model',
-        owned_by: 'anthropic',
         created: 1234567890,
+        owned_by: 'anthropic',
       },
       {
         id: 'claude-3-5-sonnet-20241022',
         object: 'model',
-        owned_by: 'anthropic',
         created: 1234567890,
+        owned_by: 'anthropic',
       },
       {
         id: 'claude-3-5-haiku-20241022',
         object: 'model',
-        owned_by: 'anthropic',
         created: 1234567890,
+        owned_by: 'anthropic',
+      },
+      // Add custom model names that users might configure
+      {
+        id: 'M2.5-highspeed',
+        object: 'model',
+        created: 1234567890,
+        owned_by: 'MiniMax',
+      },
+      {
+        id: 'glm-4.7',
+        object: 'model',
+        created: 1234567890,
+        owned_by: 'Zhipu AI',
       },
     ];
 
