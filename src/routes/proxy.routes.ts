@@ -13,6 +13,21 @@ export async function proxyRoutes(app: FastifyInstance): Promise<void> {
     await handleProxyRequest(request, reply, '/v1/responses');
   });
 
+  // Messages API (Anthropic/Claude Code endpoint)
+  app.post('/v1/messages', async (request, reply) => {
+    await handleProxyRequest(request, reply, '/chat/completions');
+  });
+
+  // Nested /v1/messages under /v1/responses for Claude Code
+  app.post('/v1/responses/v1/messages', async (request, reply) => {
+    await handleProxyRequest(request, reply, '/chat/completions');
+  });
+
+  // Count tokens endpoint
+  app.post('/v1/responses/v1/messages/count_tokens', async (request, reply) => {
+    await handleProxyRequest(request, reply, '/chat/completions');
+  });
+
   // Text completions
   app.post('/v1/completions', async (request, reply) => {
     await handleProxyRequest(request, reply, '/completions');
