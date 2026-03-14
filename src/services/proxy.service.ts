@@ -25,7 +25,9 @@ function transformToResponsesDelta(data: any, itemId: string = 'msg_1'): any {
     if (!delta) return null;
 
     // If delta only has role without content or tool_calls, skip
-    const hasContent = delta.content && delta.content.length > 0;
+    // Check for both content and reasoning_content (GLM models use reasoning_content)
+    const hasContent = (delta.content && delta.content.length > 0) ||
+                       (delta.reasoning_content && delta.reasoning_content.length > 0);
     const hasToolCalls = delta.tool_calls && delta.tool_calls.length > 0;
 
     if (!hasContent && !hasToolCalls) {
@@ -33,9 +35,12 @@ function transformToResponsesDelta(data: any, itemId: string = 'msg_1'): any {
       return null;
     }
 
+    // Use reasoning_content if content is not available (GLM models)
+    const contentText = delta.content || delta.reasoning_content || '';
+
     const result: any = {
       type: 'response.output_text.delta',
-      delta: delta.content || '',
+      delta: contentText,
       item_id: itemId,
       output_index: 0
     };
