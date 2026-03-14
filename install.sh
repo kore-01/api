@@ -8,7 +8,7 @@ set -e
 # ============================================================================
 
 INSTALL_DIR="/opt/kore"
-${KORE_PORT}=3060
+KORE_PORT=3060
 NODE_MIN_VERSION=18
 REPO_URL="https://github.com/kore-01/api.git"
 
