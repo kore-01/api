@@ -363,10 +363,98 @@ async function proxyToProvider(
       };
     }
 
-    if (isStream && res.body) {
-      const isResponsesFormat = requestPath === '/v1/responses';
+    // For /v1/responses, always convert to streaming delta format
+    // 590 API may return non-streaming even when streaming is requested
+    const isResponsesFormat = requestPath === '/v1/responses';
+
+    if (isResponsesFormat) {
+      // Always use streaming format for responses API
       const itemId = `msg_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
+      reply.raw.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'X-Accel-Buffering': 'no',
+      });
+
+      let completionText = '';
+      let providerUsage: any = null;
+
+      if (isStream && res.body) {
+        // Provider returned streaming response
+        const reader = (res.body as any).getReader();
+        const decoder = new TextDecoder();
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+
+            // Transform chunk to responses format
+            const lines = extractSSELines(chunk);
+            const transformedLines: string[] = [];
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const data = JSON.parse(line.substring(6));
+                  const transformed = transformToResponsesDelta(data, itemId);
+                  if (transformed) {
+                    transformedLines.push(`data: ${JSON.stringify(transformed)}`);
+                  }
+                } catch (e) {
+                  transformedLines.push(line);
+                }
+              } else {
+                transformedLines.push(line);
+              }
+            }
+
+            reply.raw.write(transformedLines.join('\n') + '\n');
+
+            // Parse for tracking
+            const parsedLines = extractSSELines(chunk);
+            for (const line of parsedLines) {
+              const parsed = parseSSEData(line);
+              if (parsed.delta?.content) completionText += parsed.delta.content;
+              if (parsed.usage) providerUsage = parsed.usage;
+            }
+          }
+        } catch (streamErr) {
+          console.error('Stream interrupted:', (streamErr as Error).message);
+        }
+      } else {
+        // Provider returned non-streaming response - convert to streaming
+        const data = await res.json() as any;
+        console.log('[DEBUG] Converting non-streaming to streaming, data:', JSON.stringify(data).substring(200));
+
+        const transformed = transformToResponsesDelta(data, itemId);
+        if (transformed) {
+          reply.raw.write(`data: ${JSON.stringify(transformed)}\n`);
+          completionText = transformed.delta || '';
+        }
+
+        providerUsage = data.usage;
+      }
+
+      reply.raw.write('data: [DONE]\n');
+      reply.raw.end();
+
+      const estimatedCompletion = estimateTokens(completionText);
+      return {
+        success: true, statusCode: 200,
+        providerPromptTokens: providerUsage?.prompt_tokens || 0,
+        providerCompletionTokens: providerUsage?.completion_tokens || 0,
+        providerTotalTokens: providerUsage?.total_tokens || 0,
+        estimatedPromptTokens: estimatedPrompt,
+        estimatedCompletionTokens: estimatedCompletion,
+        estimatedTotalTokens: estimatedPrompt + estimatedCompletion,
+        latencyMs: Date.now() - startTime,
+      };
+    } else if (isStream && res.body) {
+      // Non-responses streaming
       reply.raw.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
@@ -384,37 +472,8 @@ async function proxyToProvider(
           const { done, value } = await reader.read();
           if (done) break;
           const chunk = decoder.decode(value, { stream: true });
+          reply.raw.write(chunk);
 
-          // Transform chunk to responses format if needed
-          let outputChunk = chunk;
-          if (isResponsesFormat) {
-            console.log('[DEBUG] Transforming streaming chunk, isResponsesFormat=', isResponsesFormat);
-            const lines = extractSSELines(chunk);
-            const transformedLines: string[] = [];
-
-            for (const line of lines) {
-              if (line.startsWith('data: ')) {
-                try {
-                  const data = JSON.parse(line.substring(6));
-                  const transformed = transformToResponsesDelta(data, itemId);
-                  if (transformed) {
-                    transformedLines.push(`data: ${JSON.stringify(transformed)}`);
-                  }
-                } catch (e) {
-                  // Not JSON, pass through as-is
-                  transformedLines.push(line);
-                }
-              } else {
-                transformedLines.push(line);
-              }
-            }
-
-            outputChunk = transformedLines.join('\n') + '\n';
-          }
-
-          reply.raw.write(outputChunk);
-
-          // Still parse for usage/completion tracking
           const lines = extractSSELines(chunk);
           for (const line of lines) {
             const parsed = parseSSEData(line);
